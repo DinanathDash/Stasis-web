@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { Puzzle, Book, History } from "lucide-react";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,22 +38,25 @@ export function Header() {
         <div className="hidden md:flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <Link
             href="/#features"
-            className="px-3 py-2 rounded-xl hover:bg-foreground/10 hover:text-foreground transition-all"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-foreground/10 hover:text-foreground transition-all"
           >
+            <Puzzle className="h-4 w-4" />
             Features
           </Link>
           <a
             href="https://github.com/DinanathDash/Stasis/wiki"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-2 rounded-xl hover:bg-foreground/10 hover:text-foreground transition-all"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-foreground/10 hover:text-foreground transition-all"
           >
+            <Book className="h-4 w-4" />
             Documentation
           </a>
           <Link
             href="/changelog"
-            className="px-3 py-2 rounded-xl hover:bg-foreground/10 hover:text-foreground transition-all"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-foreground/10 hover:text-foreground transition-all"
           >
+            <History className="h-4 w-4" />
             Changelog
           </Link>
         </div>
