@@ -14,7 +14,11 @@ export const metadata: Metadata = {
     ],
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-      { url: "/apple-touch-icon-precomposed.png", sizes: "180x180", type: "image/png" },
+      {
+        url: "/apple-touch-icon-precomposed.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
     ],
   },
   manifest: "/manifest.webmanifest",

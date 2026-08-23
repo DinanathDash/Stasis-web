@@ -60,7 +60,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)"],
-      }
+      },
     },
   },
   plugins: [tailwindcssAnimate, tailwindcssTypography],
