@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { Dock, DockIcon, DockSeparator } from "@/components/ui/dock";
 import {
   Wifi,
   Search,
@@ -69,83 +72,21 @@ export function Mockup() {
           </div>
 
           {/* Bottom Dock */}
-          <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex items-end gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-white/20 backdrop-blur-2xl border border-white/20 rounded-2xl sm:rounded-2xl shadow-2xl">
+          <Dock className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2">
             {/* Dock Icons */}
-            <DockIcon icon="/favicon.png" tooltip="Stasis" />
-            <div className="w-[1px] h-8 sm:h-10 mx-1 bg-white/30 rounded-full" />
-            <DockIcon
-              color="bg-gradient-to-br from-blue-400 to-blue-600"
-              tooltip="Finder"
-            >
-              <div className="w-1/2 h-1/2 bg-white/20 rounded-sm" />
+            <DockIcon icon="/favicon.png" tooltip="Stasis" className="bg-transparent border-none shadow-none" />
+            <DockSeparator />
+            <DockIcon icon="/icons/finder.png" tooltip="Finder" className="bg-transparent !border-none !shadow-none" />
+            <DockIcon icon="/icons/safari.png" tooltip="Safari" className="bg-transparent !border-none !shadow-none" />
+            <DockIcon icon="/icons/messages.png" tooltip="Messages" className="bg-transparent !border-none !shadow-none" />
+            <DockIcon icon="/icons/photos.png" tooltip="Photos" className="bg-transparent !border-none !shadow-none" />
+            <DockIcon tooltip="System Settings" className="bg-transparent !border-none !shadow-none relative">
+              <img src="/icons/settings-1.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <img src="/icons/settings-2.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
             </DockIcon>
-            <DockIcon
-              color="bg-gradient-to-br from-blue-300 to-blue-500"
-              tooltip="Safari"
-            >
-              <Compass className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-            </DockIcon>
-            <DockIcon
-              color="bg-gradient-to-br from-green-400 to-green-600"
-              tooltip="Messages"
-            >
-              <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-white fill-white" />
-            </DockIcon>
-            <DockIcon
-              color="bg-gradient-to-br from-purple-400 to-purple-600"
-              tooltip="Photos"
-            >
-              <ImageIcon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-            </DockIcon>
-            <DockIcon
-              color="bg-gradient-to-br from-gray-400 to-gray-600"
-              tooltip="System Settings"
-            >
-              <Settings className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-            </DockIcon>
-            <DockIcon
-              color="bg-gradient-to-br from-zinc-800 to-black"
-              tooltip="Terminal"
-            >
-              <Terminal className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-            </DockIcon>
-          </div>
+            <DockIcon icon="/icons/terminal.png" tooltip="Terminal" className="bg-transparent !border-none !shadow-none" />
+          </Dock>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function DockIcon({
-  icon,
-  color,
-  tooltip,
-  children,
-}: {
-  icon?: string;
-  color?: string;
-  tooltip: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div className="relative group flex justify-center">
-      <div
-        className={`w-8 h-8 sm:w-11 sm:h-11 sm:hover:w-14 sm:hover:h-14 sm:hover:-translate-y-2 rounded-xl sm:rounded-[14px] shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center overflow-hidden border border-white/10 ${color || "bg-white"}`}
-      >
-        {icon ? (
-          <Image
-            src={icon}
-            alt={tooltip}
-            width={56}
-            height={56}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          children
-        )}
-      </div>
-      <div className="absolute -top-10 px-2 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap border border-white/10">
-        {tooltip}
       </div>
     </div>
   );
