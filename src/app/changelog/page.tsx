@@ -118,7 +118,11 @@ export default async function ChangelogPage() {
       return <Sparkles className="w-5 h-5 mt-0.5 text-foreground" />;
     if (lower.includes("fix") || lower.includes("bug"))
       return <Bug className="w-5 h-5 mt-0.5 text-foreground" />;
-    if (lower.includes("ui") || lower.includes("layout") || lower.includes("enhancement"))
+    if (
+      lower.includes("ui") ||
+      lower.includes("layout") ||
+      lower.includes("enhancement")
+    )
       return <Palette className="w-5 h-5 mt-0.5 text-foreground" />;
     if (lower.includes("security") || lower.includes("distribution"))
       return <ShieldCheck className="w-5 h-5 mt-0.5 text-foreground" />;

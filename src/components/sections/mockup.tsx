@@ -2,17 +2,7 @@
 
 import Image from "next/image";
 import { Dock, DockIcon, DockSeparator } from "@/components/ui/dock";
-import {
-  Wifi,
-  Search,
-  Settings2,
-  Compass,
-  MessageSquare,
-  Settings,
-  Terminal,
-  Image as ImageIcon,
-  Battery,
-} from "lucide-react";
+import { Wifi, Search, Settings2, Battery } from "lucide-react";
 
 export function Mockup() {
   return (
@@ -56,9 +46,15 @@ export function Mockup() {
               <span className="cursor-default flex items-center">File</span>
               <span className="cursor-default flex items-center">Edit</span>
               <span className="cursor-default flex items-center">View</span>
-              <span className="cursor-default hidden sm:flex items-center">Go</span>
-              <span className="cursor-default hidden sm:flex items-center">Window</span>
-              <span className="cursor-default hidden md:flex items-center">Help</span>
+              <span className="cursor-default hidden sm:flex items-center">
+                Go
+              </span>
+              <span className="cursor-default hidden sm:flex items-center">
+                Window
+              </span>
+              <span className="cursor-default hidden md:flex items-center">
+                Help
+              </span>
             </div>
 
             {/* Right Items */}
@@ -67,25 +63,55 @@ export function Mockup() {
               <Wifi className="h-2 w-2 sm:h-2.5 sm:w-2.5 md:h-3 md:w-3" />
               <Search className="h-2 w-2 sm:h-2.5 sm:w-2.5 md:h-3 md:w-3 hidden sm:block" />
               <Settings2 className="h-2 w-2 sm:h-2.5 sm:w-2.5 md:h-3 md:w-3 hidden sm:block" />
-              <span className="cursor-default flex items-center">Sun 9:55 PM</span>
+              <span className="cursor-default flex items-center">
+                Sun 9:55 PM
+              </span>
             </div>
           </div>
 
           {/* Bottom Dock */}
-          <Dock className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2">
-            {/* Dock Icons */}
-            <DockIcon icon="/favicon.png" tooltip="Stasis" className="bg-transparent border-none shadow-none" />
-            <DockSeparator />
-            <DockIcon icon="/icons/finder.png" tooltip="Finder" className="bg-transparent !border-none !shadow-none" />
-            <DockIcon icon="/icons/safari.png" tooltip="Safari" className="bg-transparent !border-none !shadow-none" />
-            <DockIcon icon="/icons/messages.png" tooltip="Messages" className="bg-transparent !border-none !shadow-none" />
-            <DockIcon icon="/icons/photos.png" tooltip="Photos" className="bg-transparent !border-none !shadow-none" />
-            <DockIcon tooltip="System Settings" className="bg-transparent !border-none !shadow-none relative">
-              <img src="/icons/settings-1.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
-              <img src="/icons/settings-2.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
-            </DockIcon>
-            <DockIcon icon="/icons/terminal.png" tooltip="Terminal" className="bg-transparent !border-none !shadow-none" />
-          </Dock>
+          <div className="absolute bottom-2 sm:bottom-4 w-full flex justify-center pointer-events-none">
+            <Dock className="pointer-events-auto">
+              {/* Dock Icons */}
+              <DockIcon
+                icon="/icons/Finder.svg"
+                tooltip="Finder"
+                className="bg-transparent !border-none !shadow-none"
+              />
+              <DockIcon
+                icon="/icons/Messages.svg"
+                tooltip="Messages"
+                className="bg-transparent !border-none !shadow-none"
+              />
+              <DockIcon
+                icon="/icons/Photos.svg"
+                tooltip="Photos"
+                className="bg-transparent !border-none !shadow-none"
+              />
+              <DockIcon
+                icon="/icons/Calendar.svg"
+                tooltip="Terminal"
+                className="bg-transparent !border-none !shadow-none"
+              />
+              <DockIcon
+                icon="/icons/Notes.svg"
+                tooltip="System Settings"
+                className="bg-transparent !border-none !shadow-none"
+              />
+              <DockIcon
+                icon="/icons/Safari.svg"
+                tooltip="Safari"
+                className="bg-transparent !border-none !shadow-none"
+              />
+              <DockSeparator />
+
+              <DockIcon
+                icon="/icons/Stasis.svg"
+                tooltip="Stasis"
+                className="bg-transparent border-none shadow-none"
+              />
+            </Dock>
+          </div>
         </div>
       </div>
     </div>
