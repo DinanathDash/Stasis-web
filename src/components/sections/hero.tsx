@@ -1,14 +1,46 @@
 import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import { siApple, siGithub } from "simple-icons";
 
-export function Hero() {
+export async function Hero() {
+  let version = "1.0.0";
+  let releaseUrl = "https://github.com/DinanathDash/Stasis/releases/latest";
+  try {
+    const res = await fetch(
+      "https://api.github.com/repos/DinanathDash/Stasis/releases/latest",
+      { next: { revalidate: 3600 } },
+    );
+    if (res.ok) {
+      const data = await res.json();
+      if (data.tag_name) {
+        // Strip leading 'v' if present (e.g. 'v0.20.2' -> '0.20.2')
+        version = data.tag_name.replace(/^v/, "");
+      }
+      if (data.html_url) {
+        releaseUrl = data.html_url;
+      }
+    }
+  } catch (error) {
+    console.error("Failed to fetch Stasis release version:", error);
+  }
+
   return (
     <section className="relative w-full flex flex-col items-center text-center pt-24 pb-32 px-4 bg-[url('/background.png')] bg-cover bg-center bg-no-repeat">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#FBFAF5]"></div>
 
       <div className="relative z-10 flex flex-col items-center">
-        <div className="mb-6 rounded-full border border-border/70 bg-background/50 backdrop-blur-md px-4 py-1.5 text-sm font-medium text-foreground">
-          Menu bar app for Apple Silicon
-        </div>
+        <a
+          href={releaseUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group mb-8 inline-flex items-center rounded-full border border-border/50 bg-muted/40 backdrop-blur-md p-1 pr-4 text-sm font-medium text-foreground shadow-sm hover:bg-muted/60 transition-colors"
+        >
+          <span className="rounded-full bg-background border border-border/50 px-3 py-1 shadow-sm mr-3">
+            Stasis {version}
+          </span>
+          <span>New feature is ready to use, let&apos;s try</span>
+          <ArrowRight className="ml-2 h-4 w-4 text-muted-foreground transition-all duration-300 group-hover:text-foreground group-hover:-rotate-45" />
+        </a>
         <h1 className="mb-6 max-w-3xl text-4xl font-medium leading-[1.15] tracking-tight md:text-6xl lg:text-[4.5rem]">
           A smarter battery icon
           <br />
@@ -23,38 +55,58 @@ export function Hero() {
           <Button
             asChild
             size="lg"
-            className="rounded-full px-8 font-medium shadow-lg hover:scale-105 transition-transform duration-200 bg-foreground text-background hover:bg-foreground/90"
+            className="h-14 text-lg group relative rounded-xl px-8 font-medium shadow-lg transition-all duration-300 bg-foreground text-background hover:bg-foreground"
           >
-            <a href="https://github.com/DinanathDash/Stasis/releases/latest">
-              <svg
-                className="mr-2 h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M18.71,19.5C17.88,20.74 17,21.95 15.66,21.97C14.32,22 13.89,21.18 12.37,21.18C10.84,21.18 10.37,21.95 9.1,22C7.79,22.05 6.8,20.68 5.96,19.47C4.25,17 2.94,12.45 4.7,9.39C5.57,7.87 7.13,6.91 8.82,6.88C10.1,6.86 11.32,7.75 12.11,7.75C12.89,7.75 14.37,6.68 15.92,6.84C16.57,6.87 18.39,7.1 19.56,8.82C19.47,8.88 17.39,10.1 17.41,12.63C17.44,15.65 20.06,16.66 20.09,16.67C20.06,16.74 19.67,18.11 18.71,19.5M13,3.5C13.73,2.67 14.94,2.04 15.94,2C16.07,3.17 15.6,4.35 14.9,5.19C14.21,6.04 13.07,6.7 11.95,6.61C11.8,5.46 12.36,4.26 13,3.5Z" />
-              </svg>
-              Download for Mac
+            <a
+              href="https://github.com/DinanathDash/Stasis/releases/latest"
+              className="flex items-center justify-center"
+            >
+              <div className="flex items-center justify-start w-7 mr-2 opacity-100 transition-all duration-300 ease-out group-hover:w-0 group-hover:mr-0 group-hover:opacity-0 group-hover:scale-50 shrink-0">
+                <svg
+                  role="img"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="!h-6 !w-6 fill-current shrink-0"
+                >
+                  <path d={siApple.path} />
+                </svg>
+              </div>
+              <span className="whitespace-nowrap relative z-10">
+                Download for Mac
+              </span>
+              <div className="flex items-center justify-end w-0 opacity-0 transition-all duration-300 ease-out group-hover:w-7 group-hover:ml-2 group-hover:opacity-100 shrink-0">
+                <ArrowRight className="!h-6 !w-6 shrink-0 -translate-x-4 scale-50 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:scale-100" />
+              </div>
             </a>
           </Button>
           <Button
             asChild
             variant="outline"
             size="lg"
-            className="rounded-full px-8 font-medium bg-background/50 backdrop-blur-md border-border/50 text-foreground hover:bg-background/80 hover:scale-105 transition-transform duration-200"
+            className="h-14 text-lg group relative overflow-hidden rounded-xl px-8 font-medium bg-background/50 backdrop-blur-md border-border/50 text-foreground transition-all duration-300 shadow-sm"
           >
             <a
               href="https://github.com/DinanathDash/Stasis"
               target="_blank"
               rel="noopener noreferrer"
+              className="flex items-center justify-center"
             >
-              <svg
-                className="mr-2 h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.3,6.95 11.15,6.84 12,6.84C12.85,6.84 13.7,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z" />
-              </svg>
-              View on GitHub
+              <div className="flex items-center justify-start w-7 mr-2 opacity-100 transition-all duration-300 ease-out group-hover:w-0 group-hover:mr-0 group-hover:opacity-0 group-hover:scale-50 shrink-0">
+                <svg
+                  role="img"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="!h-6 !w-6 fill-current shrink-0"
+                >
+                  <path d={siGithub.path} />
+                </svg>
+              </div>
+              <span className="whitespace-nowrap relative z-10">
+                View on GitHub
+              </span>
+              <div className="flex items-center justify-end w-0 opacity-0 transition-all duration-300 ease-out group-hover:w-7 group-hover:ml-2 group-hover:opacity-100 shrink-0">
+                <ArrowRight className="!h-6 !w-6 shrink-0 -translate-x-4 scale-50 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:scale-100" />
+              </div>
             </a>
           </Button>
         </div>

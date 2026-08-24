@@ -41,7 +41,7 @@
   }
   body {
     @apply text-foreground;
-    background-color: #fbfaf5;
+    background-color: #fdfbf9;
     min-height: 100vh;
   }
 }

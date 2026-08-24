@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
+import { Header } from "@/components/sections/header";
+import { Footer } from "@/components/sections/footer";
 
 export const metadata: Metadata = {
   title: "Stasis - A smarter battery icon for your MacBook",
@@ -31,8 +33,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${GeistSans.variable} font-sans antialiased`}>
-        {children}
+      <body
+        className={`${GeistSans.variable} font-sans antialiased flex flex-col min-h-screen`}
+      >
+        <Header />
+        <div className="flex-grow">{children}</div>
+        <Footer />
       </body>
     </html>
   );

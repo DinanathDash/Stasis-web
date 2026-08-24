@@ -1,4 +1,3 @@
-import { Header } from "@/components/sections/header";
 import {
   Accordion,
   AccordionContent,
@@ -133,9 +132,16 @@ export default async function ChangelogPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center pb-24">
-      <Header />
-
       <section className="w-full max-w-3xl px-4 mt-20">
+        <div className="mb-12">
+          <h1 className="text-4xl font-bold tracking-tight mb-4 text-foreground">
+            Changelog
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            All the latest updates, improvements, and fixes for Stasis.
+          </p>
+        </div>
+
         {releases.length > 0 ? (
           <Accordion
             type="single"
