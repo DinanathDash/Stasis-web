@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { ChangelogSidebar } from "@/components/ui/changelog-sidebar";
+import { ChangelogMobileNav } from "@/components/ui/changelog-mobile-nav";
 
 type Release = {
   version: string;
@@ -132,7 +134,7 @@ export default async function ChangelogPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center pb-24">
-      <section className="w-full max-w-3xl px-4 mt-20">
+      <section className="w-full max-w-5xl px-4 mt-20">
         <div className="mb-12">
           <h1 className="text-4xl font-bold tracking-tight mb-4 text-foreground">
             Changelog
@@ -142,79 +144,93 @@ export default async function ChangelogPage() {
           </p>
         </div>
 
-        {releases.length > 0 ? (
-          <Accordion
-            type="single"
-            collapsible
-            className="w-full space-y-2"
-            defaultValue={releases[0].version}
-          >
-            {releases.map((release) => (
-              <AccordionItem
-                value={release.version}
-                key={release.version}
-                className="border-b border-border/50 py-2"
-              >
-                <AccordionTrigger className="hover:no-underline hover:text-foreground">
-                  <div className="flex w-full items-center justify-between text-lg md:text-xl">
-                    <span className="font-bold tracking-tight text-foreground/90">
-                      {release.version}
-                    </span>
-                    {release.date && (
-                      <span className="text-base text-muted-foreground font-normal tabular-nums">
-                        {release.date}
-                      </span>
-                    )}
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-4 pb-8 pl-8 pr-4">
-                  {release.description && (
-                    <div className="prose prose-slate dark:prose-invert mb-8 text-muted-foreground">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {release.description}
-                      </ReactMarkdown>
-                    </div>
-                  )}
+        <div className="flex flex-col md:flex-row gap-12 items-start w-full">
+          {releases.length > 0 && (
+            <>
+              <aside className="hidden md:block w-48 shrink-0 sticky top-32 max-h-[calc(100vh-10rem)] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <ChangelogSidebar versions={releases.map((r) => r.version)} />
+              </aside>
+              <ChangelogMobileNav versions={releases.map((r) => r.version)} />
+            </>
+          )}
 
-                  <div className="space-y-8">
-                    {release.categories.map((category) => (
-                      <div key={category.title}>
-                        <div className="flex items-start gap-3 mb-4">
-                          {getCategoryIcon(category.title)}
-                          <h3 className="text-lg font-bold tracking-tight text-foreground/90">
-                            {category.title}{" "}
-                            <span className="text-muted-foreground font-normal">
-                              ({category.items.length})
-                            </span>
-                          </h3>
-                        </div>
-                        <ul className="space-y-3 pl-[32px] text-muted-foreground text-base">
-                          {category.items.map((item, i) => (
-                            <li key={i} className="leading-relaxed">
-                              <ReactMarkdown
-                                remarkPlugins={[remarkGfm]}
-                                components={{
-                                  p: ({ ...props }) => <span {...props} />,
-                                }}
-                              >
-                                {item}
-                              </ReactMarkdown>
-                            </li>
-                          ))}
-                        </ul>
+          <div className="flex-1 w-full max-w-full">
+            {releases.length > 0 ? (
+              <Accordion
+                type="single"
+                collapsible
+                className="w-full space-y-2"
+                defaultValue={releases[0].version}
+              >
+                {releases.map((release) => (
+                  <AccordionItem
+                    value={release.version}
+                    key={release.version}
+                    id={`release-${release.version}`}
+                    className="border-b border-border/50 py-2 scroll-m-32"
+                  >
+                    <AccordionTrigger className="hover:no-underline hover:text-foreground">
+                      <div className="flex w-full items-center justify-between text-lg md:text-xl">
+                        <span className="font-bold tracking-tight text-foreground/90">
+                          {release.version}
+                        </span>
+                        {release.date && (
+                          <span className="text-base text-muted-foreground font-normal tabular-nums">
+                            {release.date}
+                          </span>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        ) : (
-          <div className="text-center text-muted-foreground mt-20">
-            Failed to load changelog. Please check the Stasis GitHub repository
-            directly.
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-4 pb-8 pl-8 pr-4">
+                      {release.description && (
+                        <div className="prose prose-slate mb-8 text-muted-foreground">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {release.description}
+                          </ReactMarkdown>
+                        </div>
+                      )}
+
+                      <div className="space-y-8">
+                        {release.categories.map((category) => (
+                          <div key={category.title}>
+                            <div className="flex items-start gap-3 mb-4">
+                              {getCategoryIcon(category.title)}
+                              <h3 className="text-lg font-bold tracking-tight text-foreground/90">
+                                {category.title}{" "}
+                                <span className="text-muted-foreground font-normal">
+                                  ({category.items.length})
+                                </span>
+                              </h3>
+                            </div>
+                            <ul className="space-y-3 pl-[32px] text-muted-foreground text-base">
+                              {category.items.map((item, i) => (
+                                <li key={i} className="leading-relaxed">
+                                  <ReactMarkdown
+                                    remarkPlugins={[remarkGfm]}
+                                    components={{
+                                      p: ({ ...props }) => <span {...props} />,
+                                    }}
+                                  >
+                                    {item}
+                                  </ReactMarkdown>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            ) : (
+              <div className="text-center text-muted-foreground mt-20">
+                Failed to load changelog. Please check the Stasis GitHub
+                repository directly.
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </section>
     </main>
   );

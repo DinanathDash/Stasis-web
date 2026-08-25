@@ -1,15 +1,30 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Mail, FileText, ShieldCheck } from "lucide-react";
 import { siGithub, siX } from "simple-icons";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  const handleSamePageScroll = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    if (pathname === href) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   return (
     <footer className="relative w-full flex flex-col items-center justify-center py-24 px-4 overflow-hidden">
       {/* Background Watermark */}
       <div className="absolute inset-0 flex items-end justify-center pointer-events-none select-none z-0 overflow-hidden">
-        <h1 className="text-[20vw] font-black text-foreground/[0.05] dark:text-foreground/[0.02] tracking-tighter whitespace-nowrap translate-y-[37%]">
+        <h1 className="text-[20vw] font-black text-foreground/[0.05] tracking-tighter whitespace-nowrap translate-y-[37%]">
           Stasis
         </h1>
       </div>
@@ -82,7 +97,11 @@ export function Footer() {
           asChild
           className="rounded-2xl h-12 px-5 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all shadow-sm"
         >
-          <Link href="/terms" className="flex items-center gap-2.5">
+          <Link
+            href="/terms"
+            onClick={(e) => handleSamePageScroll(e, "/terms")}
+            className="flex items-center gap-2.5"
+          >
             <FileText className="!h-4.5 !w-4.5" />
             <span className="text-base font-medium">Terms</span>
           </Link>
@@ -92,7 +111,11 @@ export function Footer() {
           asChild
           className="rounded-2xl h-12 px-5 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all shadow-sm"
         >
-          <Link href="/privacy" className="flex items-center gap-2.5">
+          <Link
+            href="/privacy"
+            onClick={(e) => handleSamePageScroll(e, "/privacy")}
+            className="flex items-center gap-2.5"
+          >
             <ShieldCheck className="!h-5 !w-5" />
             <span className="text-base font-medium">Privacy</span>
           </Link>

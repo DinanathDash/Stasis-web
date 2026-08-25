@@ -63,7 +63,7 @@ export async function Hero() {
             className="h-14 text-lg group relative rounded-xl px-8 font-medium shadow-lg transition-all duration-300 bg-foreground text-background hover:bg-foreground"
           >
             <a
-              href="https://github.com/DinanathDash/Stasis/releases/latest"
+              href="https://github.com/DinanathDash/Stasis/releases/latest/download/Stasis.dmg"
               className="flex items-center justify-center"
             >
               <div className="flex items-center justify-start w-7 mr-2 opacity-100 transition-all duration-300 ease-out group-hover:w-0 group-hover:mr-0 group-hover:opacity-0 group-hover:scale-50 shrink-0">

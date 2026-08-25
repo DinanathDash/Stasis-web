@@ -143,7 +143,7 @@ function FeatureVideo({ src, className }: { src: string; className?: string }) {
       {/* The visible canvas playing the video */}
       <canvas
         ref={canvasRef}
-        className="w-full h-full object-cover rounded-2xl shadow-2xl ring-1 ring-white/10 dark:ring-white/20"
+        className="w-full h-full object-cover rounded-2xl shadow-2xl ring-1 ring-white/10"
         style={{
           WebkitMaskImage: "-webkit-radial-gradient(white, black)",
           WebkitBackfaceVisibility: "hidden",
@@ -252,9 +252,7 @@ function AutoScrollWheel() {
   const scrollList = [...OTHER_FEATURES, ...OTHER_FEATURES];
 
   return (
-    <div
-      className="relative flex flex-col items-center justify-center w-[90%] h-[78%] max-w-[932px] aspect-video mx-auto rounded-2xl shadow-2xl ring-1 ring-white/10 dark:ring-white/20 bg-background/80 backdrop-blur-sm z-10"
-    >
+    <div className="relative flex flex-col items-center justify-center w-[90%] h-[78%] max-w-[932px] aspect-video mx-auto rounded-2xl shadow-2xl ring-1 ring-white/10 bg-background/80 backdrop-blur-sm z-10">
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -270,14 +268,20 @@ function AutoScrollWheel() {
       />
 
       {/* Outer Wheel Container */}
-      <div 
+      <div
         className="relative w-[90%] max-w-md h-[180px] overflow-hidden shrink-0"
-        style={{ WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)" }}
+        style={{
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+        }}
       >
         {/* Base Faded List */}
         <div className="absolute top-0 left-0 right-0 flex flex-col animate-vertical-marquee">
           {scrollList.map((item, idx) => (
-            <div key={`base-${idx}`} className="flex items-center justify-center w-full h-10 text-muted-foreground opacity-30">
+            <div
+              key={`base-${idx}`}
+              className="flex items-center justify-center w-full h-10 text-muted-foreground opacity-30"
+            >
               {item.label}
             </div>
           ))}
@@ -287,17 +291,20 @@ function AutoScrollWheel() {
         <div className="absolute top-1/2 left-0 right-0 h-10 -translate-y-1/2 bg-foreground/10 border-y border-border/50 backdrop-blur-md rounded-md z-10 pointer-events-none" />
 
         {/* Static Clipping Wrapper for Highlight Text */}
-        <div 
+        <div
           className="absolute inset-0 z-20 pointer-events-none"
-          style={{ 
+          style={{
             clipPath: "inset(calc(50% - 20px) 0 calc(50% - 20px) 0)",
-            WebkitClipPath: "inset(calc(50% - 20px) 0 calc(50% - 20px) 0)"
+            WebkitClipPath: "inset(calc(50% - 20px) 0 calc(50% - 20px) 0)",
           }}
         >
           {/* Inner Highlight List (Perfectly synced) */}
           <div className="absolute top-0 left-0 right-0 flex flex-col animate-vertical-marquee">
             {scrollList.map((item, idx) => (
-              <div key={`highlight-${idx}`} className="flex items-center justify-center w-full h-10 text-foreground font-medium drop-shadow-md">
+              <div
+                key={`highlight-${idx}`}
+                className="flex items-center justify-center w-full h-10 text-foreground font-medium drop-shadow-md"
+              >
                 {item.label}
               </div>
             ))}
@@ -334,7 +341,7 @@ export function Features() {
             alt="High Energy App Detection"
             width={1920}
             height={1080}
-            className="w-[90%] h-auto max-w-[932px] mx-auto object-cover rounded-2xl shadow-2xl ring-1 ring-white/10 dark:ring-white/20 pointer-events-none select-none"
+            className="w-[90%] h-auto max-w-[932px] mx-auto object-cover rounded-2xl shadow-2xl ring-1 ring-white/10 pointer-events-none select-none"
             style={{
               WebkitMaskImage: "-webkit-radial-gradient(white, black)",
               WebkitBackfaceVisibility: "hidden",
@@ -369,7 +376,7 @@ export function Features() {
             alt="MagSafe Integration"
             width={1920}
             height={1080}
-            className="w-[90%] h-auto max-w-[932px] mx-auto object-cover rounded-2xl shadow-2xl ring-1 ring-white/10 dark:ring-white/20 pointer-events-none select-none"
+            className="w-[90%] h-auto max-w-[932px] mx-auto object-cover rounded-2xl shadow-2xl ring-1 ring-white/10 pointer-events-none select-none"
             style={{
               WebkitMaskImage: "-webkit-radial-gradient(white, black)",
               WebkitBackfaceVisibility: "hidden",
