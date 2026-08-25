@@ -1,9 +1,9 @@
 export default function TermsPage() {
   return (
     <main className="flex min-h-screen flex-col items-center pb-24">
-      <section className="w-full max-w-3xl px-4 mt-20">
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold tracking-tight mb-4 text-foreground">
+      <section className="w-full max-w-3xl px-4 mt-8 md:mt-20">
+        <div className="mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 text-foreground">
             Terms of Service
           </h1>
           <p className="text-lg text-muted-foreground">

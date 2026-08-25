@@ -22,7 +22,7 @@ export default function NotFound() {
 
       {/* Content Layer */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4">
-        <h1 className="flex justify-center text-[12rem] sm:text-[16rem] md:text-[20rem] font-black tracking-tighter leading-none text-foreground drop-shadow-xl">
+        <h1 className="flex justify-center text-[7rem] sm:text-[10rem] md:text-[14rem] lg:text-[20rem] font-black tracking-tighter leading-none text-foreground drop-shadow-xl">
           {"404".split("").map((ch, i) => (
             <Magnetic key={i} strength={0.6}>
               <span className="inline-block px-1 tabular-nums">{ch}</span>

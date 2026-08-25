@@ -134,9 +134,9 @@ export default async function ChangelogPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center pb-24">
-      <section className="w-full max-w-5xl px-4 mt-20">
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold tracking-tight mb-4 text-foreground">
+      <section className="w-full max-w-5xl px-4 mt-8 md:mt-20">
+        <div className="mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 text-foreground">
             Changelog
           </h1>
           <p className="text-lg text-muted-foreground">
@@ -144,7 +144,7 @@ export default async function ChangelogPage() {
           </p>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-12 items-start w-full">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start w-full">
           {releases.length > 0 && (
             <>
               <aside className="hidden md:block w-48 shrink-0 sticky top-32 max-h-[calc(100vh-10rem)] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -181,7 +181,7 @@ export default async function ChangelogPage() {
                         )}
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="pt-4 pb-8 pl-8 pr-4">
+                    <AccordionContent className="pt-4 pb-8 pl-4 pr-2 md:pl-8 md:pr-4">
                       {release.description && (
                         <div className="prose prose-slate mb-8 text-muted-foreground">
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -202,7 +202,7 @@ export default async function ChangelogPage() {
                                 </span>
                               </h3>
                             </div>
-                            <ul className="space-y-3 pl-[32px] text-muted-foreground text-base">
+                            <ul className="space-y-3 pl-4 md:pl-8 text-muted-foreground text-base">
                               {category.items.map((item, i) => (
                                 <li key={i} className="leading-relaxed">
                                   <ReactMarkdown
