@@ -44,4 +44,17 @@
     background-color: #fdfbf9;
     min-height: 100vh;
   }
+  a,
+  button {
+    outline: none !important;
+  }
+}
+
+@layer utilities {
+  video::-webkit-media-controls-overlay-play-button,
+  video::-webkit-media-controls-start-playback-button,
+  video::-webkit-media-controls {
+    display: none !important;
+    -webkit-appearance: none !important;
+  }
 }

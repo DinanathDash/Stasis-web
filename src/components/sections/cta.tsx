@@ -7,6 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { ObfuscatedBackground } from "@/components/ui/obfuscated-background";
 
 export function Cta() {
   const faqs = [
@@ -41,7 +42,10 @@ export function Cta() {
     <section className="w-full max-w-6xl mx-auto px-4 py-24">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-start">
         {/* Left Side: CTA Card */}
-        <div className="relative overflow-hidden rounded-3xl bg-black p-10 lg:p-14 text-black shadow-xl h-full flex flex-col justify-center min-h-[400px] bg-[url('/cta.png')] bg-cover bg-center bg-no-repeat">
+        <ObfuscatedBackground
+          src="/cta.png"
+          className="relative overflow-hidden rounded-3xl bg-black p-10 lg:p-14 text-black shadow-xl h-full flex flex-col justify-center min-h-[400px] bg-cover bg-center bg-no-repeat"
+        >
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#FBFAF5]"></div>
           <div className="relative z-10 flex flex-col items-start justify-center h-full space-y-6">
             <h2 className="text-4xl md:text-5xl font-semibold leading-tight tracking-tight">
@@ -82,7 +86,7 @@ export function Cta() {
               </Button>
             </div>
           </div>
-        </div>
+        </ObfuscatedBackground>
 
         {/* Right Side: FAQs */}
         <div className="flex flex-col justify-center h-full space-y-2">

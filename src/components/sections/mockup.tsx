@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { ObfuscatedImage } from "@/components/ui/obfuscated-image";
 import { Dock, DockIcon, DockSeparator } from "@/components/ui/dock";
 import { Wifi, Search, Settings2, Battery } from "lucide-react";
 
@@ -8,7 +8,7 @@ export function Mockup() {
   return (
     <div className="mt-16 w-full flex justify-center px-4 md:px-12 relative z-10">
       <div className="w-full max-w-6xl relative group">
-        <Image
+        <ObfuscatedImage
           src="/mockup.png"
           alt="MacBook Space Black Mockup"
           width={2048}

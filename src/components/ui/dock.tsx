@@ -16,7 +16,7 @@ import {
   useRef,
   useState,
 } from "react";
-import Image from "next/image";
+import { ObfuscatedImage } from "@/components/ui/obfuscated-image";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -102,7 +102,7 @@ export function DockIcon({
         )}
       >
         {icon ? (
-          <Image
+          <ObfuscatedImage
             src={icon}
             alt={tooltip}
             width={64}

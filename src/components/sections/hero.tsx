@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { siApple, siGithub } from "simple-icons";
+import { ObfuscatedBackground } from "@/components/ui/obfuscated-background";
 
 export async function Hero() {
   let version = "1.0.0";
@@ -25,7 +26,11 @@ export async function Hero() {
   }
 
   return (
-    <section className="relative w-full flex flex-col items-center text-center pt-24 pb-32 px-4 bg-[url('/background.png')] bg-cover bg-center bg-no-repeat">
+    <ObfuscatedBackground
+      src="/background.png"
+      as="section"
+      className="relative w-full flex flex-col items-center text-center pt-24 pb-32 px-4 bg-cover bg-center bg-no-repeat"
+    >
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#FBFAF5]"></div>
 
       <div className="relative z-10 flex flex-col items-center">
@@ -111,6 +116,6 @@ export async function Hero() {
           </Button>
         </div>
       </div>
-    </section>
+    </ObfuscatedBackground>
   );
 }
