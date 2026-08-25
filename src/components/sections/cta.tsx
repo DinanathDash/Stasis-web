@@ -39,16 +39,16 @@ export function Cta() {
   ];
 
   return (
-    <section className="w-full max-w-6xl mx-auto px-4 py-24">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-start">
+    <section className="w-full max-w-6xl mx-auto px-4 py-16 lg:py-24">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         {/* Left Side: CTA Card */}
         <ObfuscatedBackground
           src="/cta.png"
-          className="relative overflow-hidden rounded-3xl bg-black p-10 lg:p-14 text-black shadow-xl h-full flex flex-col justify-center min-h-[400px] bg-cover bg-center bg-no-repeat"
+          className="relative overflow-hidden rounded-3xl bg-black p-6 md:p-10 lg:p-14 text-black shadow-xl h-full flex flex-col justify-center min-h-[350px] lg:min-h-[400px] bg-cover bg-center bg-no-repeat"
         >
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#FBFAF5]"></div>
           <div className="relative z-10 flex flex-col items-start justify-center h-full space-y-6">
-            <h2 className="text-4xl md:text-5xl font-semibold leading-tight tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-semibold leading-tight tracking-tight">
               Found a bug or <br />
               need help?
             </h2>
@@ -95,9 +95,9 @@ export function Cta() {
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="border border-border/50 bg-muted/30 rounded-2xl px-6 data-[state=open]:bg-muted/50 transition-colors"
+                className="border border-border/50 bg-muted/30 rounded-2xl px-4 md:px-6 data-[state=open]:bg-muted/50 transition-colors"
               >
-                <AccordionTrigger className="hover:no-underline py-5 text-left font-medium text-[15px]">
+                <AccordionTrigger className="hover:no-underline py-4 md:py-5 text-left font-medium text-[15px]">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground leading-relaxed pb-5 text-[15px]">

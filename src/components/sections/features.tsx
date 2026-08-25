@@ -269,7 +269,7 @@ function AutoScrollWheel() {
 
       {/* Outer Wheel Container */}
       <div
-        className="relative w-[90%] max-w-md h-[180px] overflow-hidden shrink-0"
+        className="relative w-[90%] max-w-md h-[120px] sm:h-[140px] md:h-[180px] overflow-hidden shrink-0"
         style={{
           WebkitMaskImage:
             "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
@@ -414,13 +414,13 @@ export function Features() {
   ];
 
   return (
-    <section className="py-24 px-4">
-      <div className="max-w-7xl mx-auto flex flex-col gap-12">
+    <section className="py-16 md:py-24 px-4">
+      <div className="max-w-7xl mx-auto flex flex-col gap-8 md:gap-12">
         <div className="max-w-2xl text-center mx-auto">
-          <h2 className="text-4xl font-medium tracking-tight mb-4 text-foreground">
+          <h2 className="text-3xl md:text-4xl font-medium tracking-tight mb-4 text-foreground">
             Features
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base md:text-lg text-muted-foreground">
             Discover how Stasis helps you monitor metrics, set charge limits,
             and extend your battery lifespan.
           </p>
