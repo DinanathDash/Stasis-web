@@ -16,6 +16,12 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ChangelogSidebar } from "@/components/ui/changelog-sidebar";
 import { ChangelogMobileNav } from "@/components/ui/changelog-mobile-nav";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Changelog",
+  description: "All the latest updates, improvements, and fixes for Stasis.",
+};
 
 type Release = {
   version: string;

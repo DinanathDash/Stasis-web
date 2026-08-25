@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Privacy policy for Stasis. Learn how we handle your data.",
+};
+
 export default function PrivacyPage() {
   return (
     <main className="flex min-h-screen flex-col items-center pb-24">

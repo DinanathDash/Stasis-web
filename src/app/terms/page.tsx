@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "Terms of service and use for Stasis.",
+};
+
 export default function TermsPage() {
   return (
     <main className="flex min-h-screen flex-col items-center pb-24">
