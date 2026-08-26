@@ -85,7 +85,7 @@ export function DownloadDialog({ isOpen, onClose }: DownloadDialogProps) {
             onClick={onClose}
             className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
           />
-          <div className="fixed inset-0 z-[101] flex flex-col items-center justify-center pointer-events-none p-4">
+          <div className="fixed inset-0 z-[101] flex flex-col items-center justify-center pointer-events-none p-4 select-none">
             {/* Header Text */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
