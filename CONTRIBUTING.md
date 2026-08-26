@@ -15,11 +15,13 @@ A good branch name would be (where issue #325 is the ticket you're working on): 
 ## Get the test suite running
 
 Make sure you're using the correct Node version and install the dependencies:
+
 ```bash
 npm install
 ```
 
 Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -55,7 +57,8 @@ If a maintainer asks you to "rebase" your PR, they're saying that a lot of code 
 ## Merging a PR (maintainers only)
 
 A PR can only be merged into master by a maintainer if:
-* It is passing CI.
-* It has been approved by at least two maintainers.
-* It has no requested changes.
-* It is up to date with current master.
+
+- It is passing CI.
+- It has been approved by at least two maintainers.
+- It has no requested changes.
+- It is up to date with current master.

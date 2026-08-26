@@ -92,8 +92,14 @@ export function Footer() {
           </Button>
         </div>
 
-        <Separator orientation="vertical" className="hidden md:block h-8 w-px bg-border mx-2" />
-        <Separator orientation="horizontal" className="block md:hidden w-16 h-px bg-border" />
+        <Separator
+          orientation="vertical"
+          className="hidden md:block h-8 w-px bg-border mx-2"
+        />
+        <Separator
+          orientation="horizontal"
+          className="block md:hidden w-16 h-px bg-border"
+        />
 
         <div className="flex items-center justify-center gap-4">
           <Button
@@ -101,7 +107,11 @@ export function Footer() {
             asChild
             className="rounded-2xl h-12 px-5 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all shadow-sm"
           >
-            <Link href="/terms" onClick={(e) => handleSamePageScroll(e, "/terms")} className="flex items-center gap-2.5">
+            <Link
+              href="/terms"
+              onClick={(e) => handleSamePageScroll(e, "/terms")}
+              className="flex items-center gap-2.5"
+            >
               <FileText className="!h-4.5 !w-4.5" />
               <span className="text-base font-medium">Terms</span>
             </Link>
@@ -111,7 +121,11 @@ export function Footer() {
             asChild
             className="rounded-2xl h-12 px-5 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all shadow-sm"
           >
-            <Link href="/privacy" onClick={(e) => handleSamePageScroll(e, "/privacy")} className="flex items-center gap-2.5">
+            <Link
+              href="/privacy"
+              onClick={(e) => handleSamePageScroll(e, "/privacy")}
+              className="flex items-center gap-2.5"
+            >
               <ShieldCheck className="!h-5 !w-5" />
               <span className="text-base font-medium">Privacy</span>
             </Link>

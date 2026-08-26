@@ -69,7 +69,12 @@ export function Header() {
               }}
               className="flex items-center gap-3 text-lg font-semibold tracking-tight px-3 py-1 -mx-3 -my-2 rounded-xl hover:bg-foreground/10 transition-all z-10"
             >
-              <Image src="/favicon.png" alt="Stasis Logo" width={32} height={32} />
+              <Image
+                src="/favicon.png"
+                alt="Stasis Logo"
+                width={32}
+                height={32}
+              />
               Stasis
             </Link>
 
@@ -131,7 +136,11 @@ export function Header() {
                 <div className="relative flex items-center justify-center h-5 w-5">
                   <motion.div
                     initial={false}
-                    animate={{ opacity: isMobileMenuOpen ? 0 : 1, rotate: isMobileMenuOpen ? 90 : 0, scale: isMobileMenuOpen ? 0.5 : 1 }}
+                    animate={{
+                      opacity: isMobileMenuOpen ? 0 : 1,
+                      rotate: isMobileMenuOpen ? 90 : 0,
+                      scale: isMobileMenuOpen ? 0.5 : 1,
+                    }}
                     transition={{ duration: 0.2 }}
                     className="absolute"
                   >
@@ -139,7 +148,11 @@ export function Header() {
                   </motion.div>
                   <motion.div
                     initial={false}
-                    animate={{ opacity: isMobileMenuOpen ? 1 : 0, rotate: isMobileMenuOpen ? 0 : -90, scale: isMobileMenuOpen ? 1 : 0.5 }}
+                    animate={{
+                      opacity: isMobileMenuOpen ? 1 : 0,
+                      rotate: isMobileMenuOpen ? 0 : -90,
+                      scale: isMobileMenuOpen ? 1 : 0.5,
+                    }}
                     transition={{ duration: 0.2 }}
                     className="absolute"
                   >

@@ -19,12 +19,14 @@ Ensure you have Node.js (version 20 or higher recommended) and npm, yarn, pnpm, 
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/your-username/Stasis-web.git
    cd Stasis-web
    ```
 
 2. Install the dependencies:
+
    ```bash
    npm install
    # or
@@ -36,6 +38,7 @@ Ensure you have Node.js (version 20 or higher recommended) and npm, yarn, pnpm, 
    ```
 
 3. Start the development server:
+
    ```bash
    npm run dev
    # or

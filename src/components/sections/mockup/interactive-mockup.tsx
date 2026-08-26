@@ -4,30 +4,39 @@ import { ObfuscatedImage } from "@/components/ui/obfuscated-image";
 import { Dock, DockIcon, DockSeparator } from "@/components/ui/dock";
 import { Wifi, Search, Settings2, Battery } from "lucide-react";
 
-export function Mockup() {
+export function InteractiveMockup() {
   return (
     <div className="mt-16 w-full flex justify-center px-4 md:px-12 relative z-10">
       <div className="w-full max-w-6xl relative group">
         <ObfuscatedImage
-          src="/mockup.png"
+          src="/mockup/mockup.png"
           alt="MacBook Space Black Mockup"
-          width={2048}
-          height={1236}
+          width={1454}
+          height={872}
           priority
           className="w-full h-auto drop-shadow-2xl relative z-10 pointer-events-none"
         />
 
         {/* Screen Canvas Area */}
         <div
-          className="absolute z-20 overflow-hidden"
+          className="absolute z-20 overflow-hidden bg-black/5"
           style={{
-            left: "10.2417%",
-            top: "2.4692%",
-            width: "79.5171%",
-            height: "85.4912%",
+            left: "9.93%", // (1453.8 - 1165) / 2 / 1453.8
+            top: "3.84%", // Estimated top bezel
+            width: "80.13%", // 1165 / 1453.8
+            height: "86.35%", // 753 / 872
             borderRadius: "1.4%", // Approximate border radius for the screen corners
           }}
         >
+          {/* Notch */}
+          <div
+            className="absolute top-0 left-1/2 -translate-x-1/2 bg-black rounded-b-xl z-30"
+            style={{
+              width: "10.56%", // 123 / 1165
+              height: "2.79%", // 21 / 753
+            }}
+          />
+
           {/* Top Menu Bar Area */}
           <div className="w-full h-[3.2%] flex items-center justify-between px-3 md:px-5 text-[6px] sm:text-[7px] md:text-[9px] font-medium text-white relative z-10 bg-black/20 pt-0.5 leading-none">
             {/* Left Items */}
@@ -70,7 +79,7 @@ export function Mockup() {
           </div>
 
           {/* Bottom Dock */}
-          <div className="absolute bottom-2 sm:bottom-4 w-full flex justify-center pointer-events-none">
+          <div className="absolute bottom-2 sm:bottom-4 w-full flex justify-center pointer-events-none z-30">
             <Dock className="pointer-events-auto">
               {/* Dock Icons */}
               <DockIcon

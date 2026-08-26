@@ -43,7 +43,9 @@ export async function Hero() {
           <span className="rounded-full bg-background border border-border/50 px-3 py-1 shadow-sm mr-2 sm:mr-3 shrink-0">
             Stasis {version}
           </span>
-          <span className="truncate">New feature is ready to use, let&apos;s try</span>
+          <span className="truncate">
+            New feature is ready to use, let&apos;s try
+          </span>
           <ArrowRight className="ml-2 h-4 w-4 shrink-0 text-muted-foreground transition-all duration-300 group-hover:text-foreground group-hover:-rotate-45" />
         </a>
         <h1 className="mb-6 max-w-3xl text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-medium leading-[1.15] tracking-tight">
