@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useObfuscatedMedia } from "@/hooks/use-obfuscated-media";
-import { ObfuscatedImage } from "@/components/ui/obfuscated-image";
-import { ObfuscatedBackground } from "@/components/ui/obfuscated-background";
+import { ProtectedImage } from "@/components/ui/protected-image";
+import { ProtectedBackground } from "@/components/ui/protected-background";
 
 import {
   Anchor,
@@ -21,12 +20,11 @@ import {
 function FeatureVideo({ src, className }: { src: string; className?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const obfuscatedSrc = useObfuscatedMedia(src);
 
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas || !obfuscatedSrc) return;
+    if (!video || !canvas || !src) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -123,23 +121,20 @@ function FeatureVideo({ src, className }: { src: string; className?: string }) {
       window.removeEventListener("touchstart", unlock);
       window.removeEventListener("keydown", unlock);
     };
-  }, [obfuscatedSrc]);
+  }, [src]);
 
   return (
     <div className={`relative ${className}`}>
       {/* Hidden video acts purely as a texture source. Since it's invisible, Safari's play button is never seen. */}
-      {/* Conditionally render video only when obfuscatedSrc is ready to prevent empty src requests */}
-      {obfuscatedSrc && (
-        <video
-          ref={videoRef}
-          src={obfuscatedSrc}
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="absolute w-0 h-0 opacity-0 pointer-events-none"
-        />
-      )}
+      <video
+        ref={videoRef}
+        src={src}
+        muted
+        loop
+        playsInline
+        preload="auto"
+        className="absolute w-0 h-0 opacity-0 pointer-events-none"
+      />
       {/* The visible canvas playing the video */}
       <canvas
         ref={canvasRef}
@@ -336,7 +331,7 @@ export function Features() {
         "Instantly identify apps draining your battery. Get real-time alerts when background processes consume excessive power.",
       placeholder: (
         <div className="relative flex items-center justify-center w-full h-full">
-          <ObfuscatedImage
+          <ProtectedImage
             src="/features/energy.png"
             alt="High Energy App Detection"
             width={1920}
@@ -371,7 +366,7 @@ export function Features() {
         "Smartly manage your MagSafe charging state to optimize for battery health and reduce thermal throttling.",
       placeholder: (
         <div className="relative flex items-center justify-center w-full h-full">
-          <ObfuscatedImage
+          <ProtectedImage
             src="/features/magsafe.jpg"
             alt="MagSafe Integration"
             width={1920}
@@ -433,12 +428,12 @@ export function Features() {
               className="bg-card text-card-foreground rounded-[2rem] p-4 shadow-sm border border-border/50"
             >
               {/* Image Container with dynamic background */}
-              <ObfuscatedBackground
+              <ProtectedBackground
                 src="/cutting-mat.png"
                 className="bg-cover bg-center bg-no-repeat rounded-[1.5rem] aspect-[4/3] mb-6 relative overflow-hidden"
               >
                 {feature.placeholder}
-              </ObfuscatedBackground>
+              </ProtectedBackground>
 
               {/* Text & Toggle Container */}
               <div className="px-2">

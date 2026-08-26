@@ -74,7 +74,7 @@ export const seoMetadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: `${siteConfig.url}/images/seo/opengraph-image.png?v=1`,
+        url: `${siteConfig.url}/seo/opengraph-image.png?v=1`,
         width: 1200,
         height: 630,
         alt: siteConfig.name,
@@ -90,7 +90,7 @@ export const seoMetadata: Metadata = {
     },
     description: siteConfig.description,
     creator: siteConfig.twitter,
-    images: [`${siteConfig.url}/images/seo/twitter-image.png?v=1`],
+    images: [`${siteConfig.url}/seo/twitter-image.png?v=1`],
   },
 
   manifest: "/manifest.webmanifest",

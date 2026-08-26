@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { siApple, siGithub } from "simple-icons";
-import { ObfuscatedBackground } from "@/components/ui/obfuscated-background";
+import { ProtectedBackground } from "@/components/ui/protected-background";
 
 export async function Hero() {
   let version = "1.0.0";
@@ -26,7 +26,7 @@ export async function Hero() {
   }
 
   return (
-    <ObfuscatedBackground
+    <ProtectedBackground
       src="/background.png"
       as="section"
       className="relative w-full flex flex-col items-center text-center pt-16 md:pt-24 pb-20 md:pb-32 px-4 bg-cover bg-center bg-no-repeat"
@@ -118,6 +118,6 @@ export async function Hero() {
           </Button>
         </div>
       </div>
-    </ObfuscatedBackground>
+    </ProtectedBackground>
   );
 }

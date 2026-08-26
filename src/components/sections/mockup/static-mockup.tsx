@@ -1,13 +1,13 @@
 "use client";
 
-import { ObfuscatedImage } from "@/components/ui/obfuscated-image";
+import { ProtectedImage } from "@/components/ui/protected-image";
 
 export function StaticMockup() {
   return (
     <div className="mt-16 w-full flex justify-center px-4 md:px-12 relative z-10">
       <div className="w-full max-w-6xl relative group">
         {/* Laptop Frame */}
-        <ObfuscatedImage
+        <ProtectedImage
           src="/mockup/mockup.png"
           alt="MacBook Space Black Mockup"
           width={1454}
@@ -26,7 +26,7 @@ export function StaticMockup() {
             height: "86.3%", // 753 / 872
           }}
         >
-          <ObfuscatedImage
+          <ProtectedImage
             src="/mockup/static-screen.png"
             alt="Static Screen Content"
             width={1165}

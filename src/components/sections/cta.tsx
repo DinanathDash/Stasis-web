@@ -7,7 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { ObfuscatedBackground } from "@/components/ui/obfuscated-background";
+import { ProtectedBackground } from "@/components/ui/protected-background";
 
 export function Cta() {
   const faqs = [
@@ -42,7 +42,7 @@ export function Cta() {
     <section className="w-full max-w-6xl mx-auto px-4 py-16 lg:py-24">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         {/* Left Side: CTA Card */}
-        <ObfuscatedBackground
+        <ProtectedBackground
           src="/cta.png"
           className="relative overflow-hidden rounded-3xl bg-black p-6 md:p-10 lg:p-14 text-black shadow-xl h-full flex flex-col justify-center min-h-[350px] lg:min-h-[400px] bg-cover bg-center bg-no-repeat"
         >
@@ -86,7 +86,7 @@ export function Cta() {
               </Button>
             </div>
           </div>
-        </ObfuscatedBackground>
+        </ProtectedBackground>
 
         {/* Right Side: FAQs */}
         <div className="flex flex-col justify-center h-full space-y-2">
