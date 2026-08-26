@@ -21,8 +21,8 @@ export function StaticMockup() {
           className="absolute z-0 overflow-hidden"
           style={{
             left: "9.88%", // (1453.8 - 1165) / 2 / 1453.8
-            top: "2.26%", // Estimated top bezel
-            width: "80.13%", // 1165 / 1453.8
+            top: "2.25%", // Estimated top bezel
+            width: "80.16%", // 1165 / 1453.8
             height: "86.3%", // 753 / 872
           }}
         >
