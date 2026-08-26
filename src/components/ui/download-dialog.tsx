@@ -148,15 +148,15 @@ export function DownloadDialog({ isOpen, onClose }: DownloadDialogProps) {
               {/* Main Content Area */}
               <ProtectedBackground
                 src="/dmg/dmg-background.png"
-                className="relative h-[340px] w-full overflow-hidden bg-[#E7E7E7] bg-cover bg-center"
+                className="relative h-[440px] md:h-[340px] w-full overflow-hidden bg-[#E7E7E7] bg-cover bg-center"
               >
                 {/* Gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent from-40% to-[#FBFAF5]/70 pointer-events-none"></div>
 
-                <div className="relative z-10 flex h-full items-center justify-center gap-12 px-12 select-none">
+                <div className="-top-4 md:top-0 relative z-10 flex flex-col md:flex-row h-full items-center justify-center gap-4 md:gap-12 px-4 md:px-12 select-none">
                   {/* Stasis App Icon */}
-                  <div className="flex flex-col items-center gap-3 relative z-50">
-                    <div className="relative h-28 w-28 rounded-3xl bg-white/10 backdrop-blur-md border border-white/40 shadow-xl shadow-black/5 ring-1 ring-black/5 flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-2 md:gap-3 relative z-50">
+                    <div className="relative h-24 w-24 md:h-28 md:w-28 rounded-3xl bg-white/10 backdrop-blur-md border border-white/40 shadow-xl shadow-black/5 ring-1 ring-black/5 flex items-center justify-center">
                       <motion.div
                         drag
                         dragSnapToOrigin
@@ -175,31 +175,42 @@ export function DownloadDialog({ isOpen, onClose }: DownloadDialogProps) {
                           alt="Stasis"
                           width={100}
                           height={100}
-                          className="object-contain p-2 pointer-events-none w-auto h-auto"
+                          className="object-contain p-2 pointer-events-none w-auto h-auto scale-90 md:scale-100"
                         />
                       </motion.div>
                     </div>
-                    <span className="text-sm font-medium text-black/80 drop-shadow-sm">
+                    <span className="text-xs md:text-sm font-medium text-black/80 drop-shadow-sm">
                       Stasis
                     </span>
                   </div>
 
-                  {/* Arrow */}
-                  <div className="relative -mt-48">
+                  {/* Arrow (Mobile) */}
+                  <div className="relative block md:hidden">
                     <ProtectedImage
                       src="/dmg/arrow-vertical.svg"
                       alt="Arrow"
+                      width={38}
+                      height={38}
+                      className="object-contain drop-shadow-xl"
+                    />
+                  </div>
+
+                  {/* Arrow (Desktop) */}
+                  <div className="relative hidden md:block -mt-48">
+                    <ProtectedImage
+                      src="/dmg/arrow-horizontal.svg"
+                      alt="Arrow"
                       width={170}
                       height={170}
-                      className="object-contain drop-shadow-xl w-auto h-auto"
+                      className="object-contain drop-shadow-xl"
                     />
                   </div>
 
                   {/* Macintosh HD Drive */}
-                  <div className="flex flex-col items-center gap-3">
+                  <div className="flex flex-col items-center gap-2 md:gap-3">
                     <div
                       ref={dropZoneRef}
-                      className={`relative h-28 w-28 rounded-3xl backdrop-blur-md border shadow-xl shadow-black/5 ring-1 ring-black/5 flex items-center justify-center overflow-hidden transition-all duration-300 ${
+                      className={`relative h-24 w-24 md:h-28 md:w-28 rounded-3xl backdrop-blur-md border shadow-xl shadow-black/5 ring-1 ring-black/5 flex items-center justify-center overflow-hidden transition-all duration-300 ${
                         isHoveringDropZone
                           ? "bg-white/30 border-white/80 scale-105 shadow-2xl"
                           : "bg-white/10 border-white/40"
@@ -210,10 +221,10 @@ export function DownloadDialog({ isOpen, onClose }: DownloadDialogProps) {
                         alt="Macintosh HD"
                         width={110}
                         height={110}
-                        className="object-contain p-2 drop-shadow-xl w-auto h-auto"
+                        className="object-contain p-2 drop-shadow-xl w-auto h-auto scale-90 md:scale-100"
                       />
                     </div>
-                    <span className="text-sm font-medium text-black/80 drop-shadow-sm">
+                    <span className="text-xs md:text-sm font-medium text-black/80 drop-shadow-sm">
                       Macintosh HD
                     </span>
                   </div>
