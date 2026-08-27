@@ -91,8 +91,18 @@ export const SCENE_CENTER_BIAS = 24;
 // Scene choreography — the two knobs that define the end composition.
 // ---------------------------------------------------------------------------
 
-/** Rendered stage width as a fraction of viewport width, at full scroll. */
-export const SCENE_END_WIDTH_VW = 1.1;
+/**
+ * Rendered stage width as a fraction of viewport width, at full scroll.
+ * This is the zoom control — raise it to push in harder, lower it to ease off.
+ *
+ * It only controls size. The right edge is pinned by SCENE_END_RIGHT_VW, so
+ * changing this moves the left edge alone and the copy slot keeps its width.
+ *
+ * Landmarks: at 1.0 the mockup ends exactly as wide as the viewport; above
+ * ~1.15 it starts to crop the menu bar and dock vertically. The current 0.775
+ * bleeds ~16% off the left and clears the top and bottom entirely.
+ */
+export const SCENE_END_WIDTH_VW = 0.775;
 /** Where the stage's right edge lands, as a fraction of viewport width.
  *  Everything to the right of this is the free slot for copy. */
 export const SCENE_END_RIGHT_VW = 0.62;
@@ -102,9 +112,9 @@ export const SCENE_END_RIGHT_VW = 0.62;
  * timeline runs 1 -> k), `x` is in real screen px because `translate(x)
  * scale(k)` translates in the parent's coordinate space.
  *
- * The bleed is deliberately asymmetric: hard off the left, slight off the top
- * and bottom, and a hard stop before the right. That is what reconciles
- * "grows past the viewport edges" with "leaves the right side free".
+ * The bleed is deliberately asymmetric: the mockup runs off the left while
+ * stopping hard before the right, which is what keeps the copy slot clear
+ * while the machine still reads as larger than the frame it is in.
  */
 export function computeSceneTargets(baseScale: number, vw: number) {
   const endScale = (SCENE_END_WIDTH_VW * vw) / STAGE_W;
