@@ -1,9 +1,18 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
+import { useGSAP } from "@gsap/react";
 import { AnimatedMockupBody } from "./animated-mockup";
 import { StageScaleProvider, useStageScale } from "./stage-context";
-import { LEGACY_W, LEGACY_H, LEGACY_SCALE } from "./stage-geometry";
+import { useScene } from "./scene-context";
+import {
+  LEGACY_W,
+  LEGACY_H,
+  LEGACY_SCALE,
+  NOTE_END_DX,
+  NOTE_END_DY,
+  SCENE_REVEAL_AT,
+} from "./stage-geometry";
 
 /**
  * Dinanath's interactive mockup, mounted on the scroll scene's design-unit
@@ -22,7 +31,12 @@ import { LEGACY_W, LEGACY_H, LEGACY_SCALE } from "./stage-geometry";
  * Anything that should stay at reading size belongs in the scene's `aside`.
  */
 export function StagedAnimatedMockup() {
+  const rootRef = useRef<HTMLDivElement>(null);
   const stageScale = useStageScale();
+  const scene = useScene();
+  const timeline = scene?.timeline ?? null;
+
+  const [revealBattery, setRevealBattery] = useState(false);
 
   /**
    * Republish the scale with the legacy factor folded in.
@@ -49,8 +63,39 @@ export function StagedAnimatedMockup() {
     [stageScale],
   );
 
+  useGSAP(
+    () => {
+      if (!timeline || !rootRef.current) return;
+
+      // Relocate the note as the machine grows, so it reads as a label beside
+      // the mockup rather than a caption stranded above it.
+      const note = rootRef.current.querySelector("[data-mockup-note]");
+      if (note) {
+        timeline.fromTo(
+          note,
+          { x: 0, y: 0 },
+          {
+            x: NOTE_END_DX,
+            y: NOTE_END_DY,
+            duration: 0.5,
+            ease: "power2.inOut",
+          },
+          0.15,
+        );
+      }
+
+      // Open the popover unprompted once the mockup is settled and large, so
+      // it is obvious what the note is pointing at. A timeline callback rather
+      // than a progress threshold read per frame, so it fires exactly once per
+      // crossing and costs nothing in between.
+      timeline.call(() => setRevealBattery(true), undefined, SCENE_REVEAL_AT);
+    },
+    { dependencies: [timeline], scope: rootRef },
+  );
+
   return (
     <div
+      ref={rootRef}
       className="absolute left-0 top-0 origin-top-left select-none"
       style={{
         width: LEGACY_W,
@@ -59,7 +104,7 @@ export function StagedAnimatedMockup() {
       }}
     >
       <StageScaleProvider scaleRef={composedScale}>
-        <AnimatedMockupBody />
+        <AnimatedMockupBody revealBattery={revealBattery} />
       </StageScaleProvider>
     </div>
   );

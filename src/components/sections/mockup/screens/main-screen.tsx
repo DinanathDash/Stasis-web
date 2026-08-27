@@ -12,12 +12,26 @@ import { chipLay1Sound } from "@/lib/chip-lay-1";
 
 interface MainScreenProps {
   onLock?: () => void;
+  /**
+   * Flip to true to open the battery popover once, unprompted — used by the
+   * scroll scene to demonstrate what is interactive when the mockup reaches
+   * its viewing position. The user keeps full control afterwards; this only
+   * opens, it never forces it back shut.
+   */
+  revealBattery?: boolean;
 }
 
-export function MainScreen({ onLock }: MainScreenProps) {
+export function MainScreen({ onLock, revealBattery }: MainScreenProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [time, setTime] = useState("");
-  const [isBatteryOpen, setIsBatteryOpen] = useState(false);
+  /**
+   * `null` until the viewer touches the popover themselves, so until then the
+   * scene's reveal drives it; after that their choice wins and the reveal can
+   * never reopen something they closed. Derived rather than synced in an
+   * effect, which would be a render-then-correct round trip.
+   */
+  const [userBatteryOpen, setUserBatteryOpen] = useState<boolean | null>(null);
+  const isBatteryOpen = userBatteryOpen ?? !!revealBattery;
 
   useEffect(() => {
     const updateTime = () => {
@@ -110,7 +124,7 @@ export function MainScreen({ onLock }: MainScreenProps) {
           <div
             id="battery-trigger"
             className="flex items-center gap-1.5 h-full cursor-pointer"
-            onClick={() => setIsBatteryOpen(!isBatteryOpen)}
+            onClick={() => setUserBatteryOpen(!isBatteryOpen)}
           >
             <span className="text-[10px] sm:text-xs font-medium tabular-nums flex items-center h-full pt-px">
               78%
@@ -152,7 +166,7 @@ export function MainScreen({ onLock }: MainScreenProps) {
         {/* Battery Popover */}
         <BatteryPopover
           isOpen={isBatteryOpen}
-          onClose={() => setIsBatteryOpen(false)}
+          onClose={() => setUserBatteryOpen(false)}
         />
       </div>
 

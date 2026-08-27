@@ -108,6 +108,25 @@ export const SCENE_END_WIDTH_VW = 0.775;
 export const SCENE_END_RIGHT_VW = 0.62;
 
 /**
+ * Where the "psst… it's interactive" note travels to as the scene zooms in,
+ * as an offset from where it is authored (above the frame's top-right).
+ *
+ * These are in the note's own coordinate space — CSS px inside the 1152-wide
+ * legacy box, not design units — because that is the space the note's
+ * `-top-26 / -right-20` is written in. Multiply by LEGACY_SCALE for DU.
+ *
+ * The default walks it down beside the machine's upper right, clear of the
+ * aside copy (which is vertically centred). Tune freely; this is choreography,
+ * not geometry.
+ */
+export const NOTE_END_DX = 32;
+export const NOTE_END_DY = 206;
+
+/** Where on the timeline the battery popover reveals itself, as a fraction of
+ *  the pin — late enough that the mockup has settled and grown. */
+export const SCENE_REVEAL_AT = 0.55;
+
+/**
  * Resolve the scroll-driven targets. `k` multiplies the base scale (so the
  * timeline runs 1 -> k), `x` is in real screen px because `translate(x)
  * scale(k)` translates in the parent's coordinate space.

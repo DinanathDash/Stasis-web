@@ -21,11 +21,21 @@ import { HandwrittenNote } from "@/components/ui/handwritten-note";
  * MainScreen. Without `onLock`, clicking the Apple menu still plays its sound
  * but no longer locks.
  */
-export function AnimatedMockupBody() {
+export function AnimatedMockupBody({
+  revealBattery,
+}: {
+  /** Forwarded to MainScreen — see its prop docs. */
+  revealBattery?: boolean;
+} = {}) {
   return (
     <div className="w-full relative group">
-      {/* Handwritten Note pointing to the screen */}
-      <div className="absolute -top-26 right-4 md:-right-20 z-50 hidden md:block">
+      {/* Handwritten Note pointing to the screen. `data-mockup-note` is the
+          handle the scroll scene uses to relocate it as the mockup zooms;
+          keep it if you move this. */}
+      <div
+        data-mockup-note
+        className="absolute -top-26 right-4 md:-right-20 z-50 hidden md:block"
+      >
         <HandwrittenNote
           arrowPosition="left"
           side="none"
@@ -61,7 +71,7 @@ export function AnimatedMockupBody() {
           zIndex: 0,
         }}
       >
-        <MainScreen />
+        <MainScreen revealBattery={revealBattery} />
       </div>
     </div>
   );
