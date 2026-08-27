@@ -85,6 +85,19 @@ export const SCENE_DRIFT_OFFSET = 0.12;
 export const SCENE_EASE_SETTLE = "power2.out";
 export const SCENE_SETTLE_DURATION = 0.2;
 
+/**
+ * The "psst… it's interactive" note swaps position by cross-fade rather than
+ * travelling. The gap between `out` ending and `in` starting is deliberate —
+ * a beat with no note at all, so the second one reads as a new remark rather
+ * than the first one having moved.
+ */
+export const SCENE_NOTE_SWAP = {
+  outAt: 0.12,
+  outDuration: 0.14,
+  inAt: 0.34,
+  inDuration: 0.18,
+} as const;
+
 export const LENIS_OPTIONS = {
   lerp: 0.1,
   smoothWheel: true,

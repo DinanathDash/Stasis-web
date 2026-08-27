@@ -2,6 +2,8 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
+import { HandwrittenNote } from "@/components/ui/handwritten-note";
+import { SCENE_NOTE_SWAP } from "@/lib/ease";
 import { AnimatedMockupBody } from "./animated-mockup";
 import { StageScaleProvider, useStageScale } from "./stage-context";
 import { useScene } from "./scene-context";
@@ -9,8 +11,8 @@ import {
   LEGACY_W,
   LEGACY_H,
   LEGACY_SCALE,
-  NOTE_END_DX,
-  NOTE_END_DY,
+  NOTE_ALT_LEFT,
+  NOTE_ALT_TOP,
   SCENE_REVEAL_AT,
 } from "./stage-geometry";
 
@@ -19,10 +21,10 @@ import {
  * stage.
  *
  * The adaptation is one uniform scale and nothing else. His mockup and its
- * three screens are authored in CSS px against a 1152 x 690.9 box, and
- * 1454 / 1152 is exactly DU_PER_CSS_PX — so rendering that box at its natural
- * size and scaling it fills the stage precisely, reproducing his proportions
- * rather than reinterpreting them. His screen percentages land on the frame's
+ * screens are authored in CSS px against a 1152 x 690.9 box, and 1454 / 1152
+ * is exactly DU_PER_CSS_PX — so rendering that box at its natural size and
+ * scaling it fills the stage precisely, reproducing his proportions rather
+ * than reinterpreting them. His screen percentages land on the frame's
  * measured cutout to within half a design unit.
  *
  * A consequence worth knowing: the dock, the menu bar and every `text-[10px]`
@@ -32,6 +34,7 @@ import {
  */
 export function StagedAnimatedMockup() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const noteAltRef = useRef<HTMLDivElement>(null);
   const stageScale = useStageScale();
   const scene = useScene();
   const timeline = scene?.timeline ?? null;
@@ -67,27 +70,38 @@ export function StagedAnimatedMockup() {
     () => {
       if (!timeline || !rootRef.current) return;
 
-      // Relocate the note as the machine grows, so it reads as a label beside
-      // the mockup rather than a caption stranded above it.
+      // Retire the note from above the frame, then bring a second one in
+      // beside the popover. Two notes cross-fading rather than one sliding:
+      // a slide drags the eye across the copy column on its way over.
       const note = rootRef.current.querySelector("[data-mockup-note]");
       if (note) {
-        timeline.fromTo(
+        timeline.to(
           note,
-          { x: 0, y: 0 },
           {
-            x: NOTE_END_DX,
-            y: NOTE_END_DY,
-            duration: 0.5,
-            ease: "power2.inOut",
+            opacity: 0,
+            duration: SCENE_NOTE_SWAP.outDuration,
+            ease: "power1.out",
           },
-          0.15,
+          SCENE_NOTE_SWAP.outAt,
+        );
+      }
+
+      if (noteAltRef.current) {
+        timeline.to(
+          noteAltRef.current,
+          {
+            opacity: 1,
+            duration: SCENE_NOTE_SWAP.inDuration,
+            ease: "power1.out",
+          },
+          SCENE_NOTE_SWAP.inAt,
         );
       }
 
       // Open the popover unprompted once the mockup is settled and large, so
-      // it is obvious what the note is pointing at. A timeline callback rather
-      // than a progress threshold read per frame, so it fires exactly once per
-      // crossing and costs nothing in between.
+      // it is obvious what the second note is pointing at. A timeline callback
+      // rather than a progress threshold read per frame, so it fires exactly
+      // once per crossing and costs nothing in between.
       timeline.call(() => setRevealBattery(true), undefined, SCENE_REVEAL_AT);
     },
     { dependencies: [timeline], scope: rootRef },
@@ -106,6 +120,35 @@ export function StagedAnimatedMockup() {
       <StageScaleProvider scaleRef={composedScale}>
         <AnimatedMockupBody revealBattery={revealBattery} />
       </StageScaleProvider>
+
+      {/*
+        The second note, beside the battery popover. Scene-only, so it lives
+        here rather than in AnimatedMockupBody — the standalone mockup has no
+        scroll to fade it in and would just show two notes at once.
+
+        Starts at opacity 0 inline rather than via a class, so it is invisible
+        on the server-rendered first paint and stays invisible in the degraded
+        branch, where no timeline is ever built to reveal it.
+      */}
+      <div
+        ref={noteAltRef}
+        className="pointer-events-none absolute z-50 hidden w-max opacity-0 md:block"
+        style={{ top: NOTE_ALT_TOP, left: NOTE_ALT_LEFT }}
+      >
+        <HandwrittenNote
+          arrowPosition="left"
+          side="none"
+          arrowOffsetX={0}
+          arrowOffsetY={12}
+          // scaleX flips it to point left at the popover; scaleY turns the
+          // arc from an "n" into a "u" so it sweeps under the gap rather than
+          // over it. Together they compose to rotate(172deg).
+          arrowClassName="[transform:rotate(-8deg)_scaleX(-1)_scaleY(-1)]"
+          className="text-white opacity-90 rotate-[-6deg]"
+        >
+          psst.... its interactive!
+        </HandwrittenNote>
+      </div>
     </div>
   );
 }

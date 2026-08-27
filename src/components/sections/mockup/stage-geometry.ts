@@ -108,19 +108,28 @@ export const SCENE_END_WIDTH_VW = 0.775;
 export const SCENE_END_RIGHT_VW = 0.62;
 
 /**
- * Where the "psst… it's interactive" note travels to as the scene zooms in,
- * as an offset from where it is authored (above the frame's top-right).
- *
- * These are in the note's own coordinate space — CSS px inside the 1152-wide
- * legacy box, not design units — because that is the space the note's
- * `-top-26 / -right-20` is written in. Multiply by LEGACY_SCALE for DU.
- *
- * The default walks it down beside the machine's upper right, clear of the
- * aside copy (which is vertically centred). Tune freely; this is choreography,
- * not geometry.
+ * The lid's right edge, in legacy px, measured from mockup.png's alpha across
+ * the vertical band the note occupies. The base flares wider than this — out
+ * to the full 1152 — but only lower down, past the note.
  */
-export const NOTE_END_DX = 32;
-export const NOTE_END_DY = 206;
+export const LID_RIGHT = 1052;
+
+/**
+ * Where the second "psst… it's interactive" note sits — the one that fades in
+ * beside the battery popover once the mockup has zoomed.
+ *
+ * The note does not travel between the two spots. Sliding it dragged the eye
+ * across the copy column; a cross-fade lets it simply be somewhere else.
+ *
+ * Anchored from the LEFT, not the right: the arrow tip is the edge that has
+ * to clear the machine, and a right-anchored note pushes its own width back
+ * over the lid as the text grows.
+ *
+ * In the note's own coordinate space — CSS px inside the 1152-wide legacy
+ * box, not design units. Multiply by LEGACY_SCALE for DU.
+ */
+export const NOTE_ALT_LEFT = LID_RIGHT + 16;
+export const NOTE_ALT_TOP = 22;
 
 /** Where on the timeline the battery popover reveals itself, as a fraction of
  *  the pin — late enough that the mockup has settled and grown. */
