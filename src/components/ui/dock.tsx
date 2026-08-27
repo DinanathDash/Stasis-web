@@ -19,14 +19,59 @@ import {
 import { ProtectedImage } from "@/components/ui/protected-image";
 import { cn } from "@/lib/utils";
 import { useStageScale } from "@/components/sections/mockup/stage-context";
-import { DOCK } from "@/components/sections/mockup/stage-geometry";
+
+/**
+ * Dock sizing, in whatever unit the surrounding mockup is authored in.
+ *
+ * It is a prop rather than a constant because the mockups disagree: the
+ * percentage-based ones size their screen against the viewport, so the dock
+ * has to stay in real CSS px, while the design-unit stage authors everything
+ * against a fixed 1454px canvas and needs correspondingly larger numbers.
+ */
+export type DockMetrics = {
+  H: number;
+  ICON_BASE: number;
+  ICON_MAX: number;
+  MAG_RANGE: number;
+  GAP: number;
+  PAD_X: number;
+  PAD_Y: number;
+  RADIUS: number;
+  ICON_RADIUS: number;
+  SEP_W: number;
+  SEP_H: number;
+  SEP_MX: number;
+  TOOLTIP_OFFSET: number;
+  TOOLTIP_TEXT: number;
+};
+
+/** Real CSS px, matching how the dock has always rendered. Default so the
+ *  percentage-based mockups are unaffected by the stage's larger tokens. */
+export const DOCK_DEFAULT: DockMetrics = {
+  H: 60,
+  ICON_BASE: 40,
+  ICON_MAX: 64,
+  MAG_RANGE: 150,
+  GAP: 8,
+  PAD_X: 12,
+  PAD_Y: 8,
+  RADIUS: 16,
+  ICON_RADIUS: 10,
+  SEP_W: 2,
+  SEP_H: 40,
+  SEP_MX: 4,
+  TOOLTIP_OFFSET: 38,
+  TOOLTIP_TEXT: 12,
+};
 
 export function Dock({
   children,
   className,
+  metrics = DOCK_DEFAULT,
 }: {
   children: ReactNode;
   className?: string;
+  metrics?: DockMetrics;
 }) {
   const mouseX = useMotionValue(Infinity);
 
@@ -39,18 +84,21 @@ export function Dock({
         className,
       )}
       style={{
-        height: DOCK.H,
-        gap: DOCK.GAP,
-        borderRadius: DOCK.RADIUS,
-        paddingInline: DOCK.PAD_X,
-        paddingBlock: DOCK.PAD_Y,
+        height: metrics.H,
+        gap: metrics.GAP,
+        borderRadius: metrics.RADIUS,
+        paddingInline: metrics.PAD_X,
+        paddingBlock: metrics.PAD_Y,
       }}
     >
       {Children.map(children, (child) => {
         if (child) {
           return cloneElement(
-            child as ReactElement<{ mouseX: MotionValue<number> }>,
-            { mouseX },
+            child as ReactElement<{
+              mouseX: MotionValue<number>;
+              metrics: DockMetrics;
+            }>,
+            { mouseX, metrics },
           );
         }
         return child;
@@ -65,12 +113,14 @@ export function DockIcon({
   tooltip,
   children,
   className,
+  metrics = DOCK_DEFAULT,
 }: {
   mouseX?: MotionValue<number>;
   icon?: string;
   tooltip: string;
   children?: ReactNode;
   className?: string;
+  metrics?: DockMetrics;
 }) {
   const defaultMouseX = useMotionValue(Infinity);
   const activeMouseX = mouseX ?? defaultMouseX;
@@ -82,13 +132,16 @@ export function DockIcon({
    *
    * `clientX` and `getBoundingClientRect()` are both post-transform viewport
    * px, so the raw distance shrinks and grows with the stage's scale — while
-   * MAG_RANGE is authored in design units. Left unconverted, the
+   * MAG_RANGE is authored in the mockup's own units. Left unconverted, the
    * magnification field narrows as the mockup grows (only the hovered icon
    * reacts) and widens as it shrinks (every icon lifts at once). Divide.
    *
    * The width range below is the opposite case and must NOT be divided: it is
-   * set as CSS `width`, which already lives in the local design space that the
-   * stage transform then scales.
+   * set as CSS `width`, which already lives in the local space that any
+   * enclosing transform then scales.
+   *
+   * Outside a stage `useStageScale` yields a stable 1, so this is a no-op for
+   * the percentage-based mockups.
    */
   const distance = useTransform(activeMouseX, (val: number) => {
     const el = ref.current;
@@ -99,10 +152,8 @@ export function DockIcon({
 
   const widthSync = useTransform(
     distance,
-    [-DOCK.MAG_RANGE, 0, DOCK.MAG_RANGE],
-    // Annotated because DOCK is `as const`, which would otherwise infer the
-    // output range as the literal union `46 | 74`.
-    [DOCK.ICON_BASE, DOCK.ICON_MAX, DOCK.ICON_BASE] as number[],
+    [-metrics.MAG_RANGE, 0, metrics.MAG_RANGE],
+    [metrics.ICON_BASE, metrics.ICON_MAX, metrics.ICON_BASE],
   );
   const width = useSpring(widthSync, {
     mass: 0.1,
@@ -122,10 +173,10 @@ export function DockIcon({
     >
       <div
         className={cn(
-          "flex h-full w-full cursor-pointer items-center justify-center overflow-hidden bg-transparent will-change-transform",
+          "flex h-full w-full cursor-pointer items-center justify-center overflow-hidden border border-white/10 bg-transparent will-change-transform",
           className,
         )}
-        style={{ borderRadius: DOCK.ICON_RADIUS }}
+        style={{ borderRadius: metrics.ICON_RADIUS }}
       >
         {icon ? (
           <ProtectedImage
@@ -150,10 +201,10 @@ export function DockIcon({
             transition={{ duration: 0.15 }}
             className="pointer-events-none absolute z-50 whitespace-nowrap rounded-full border border-white/10 bg-[#1a1a1a]/90 tracking-wide text-white shadow-2xl"
             style={{
-              top: -DOCK.TOOLTIP_OFFSET,
-              fontSize: DOCK.TOOLTIP_TEXT,
-              paddingInline: DOCK.PAD_X,
-              paddingBlock: DOCK.PAD_Y / 2,
+              top: -metrics.TOOLTIP_OFFSET,
+              fontSize: metrics.TOOLTIP_TEXT,
+              paddingInline: metrics.PAD_X,
+              paddingBlock: metrics.PAD_Y / 2,
             }}
           >
             {tooltip}
@@ -165,14 +216,18 @@ export function DockIcon({
   );
 }
 
-export function DockSeparator() {
+export function DockSeparator({
+  metrics = DOCK_DEFAULT,
+}: {
+  metrics?: DockMetrics;
+}) {
   return (
     <div
       className="shrink-0 rounded-full bg-white/30"
       style={{
-        width: DOCK.SEP_W,
-        height: DOCK.SEP_H,
-        marginInline: DOCK.SEP_MX,
+        width: metrics.SEP_W,
+        height: metrics.SEP_H,
+        marginInline: metrics.SEP_MX,
       }}
     />
   );

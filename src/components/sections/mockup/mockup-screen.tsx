@@ -6,6 +6,9 @@ import { StageLayer } from "./design-stage";
 import { MenuBar } from "./menu-bar";
 import { SCREEN, MENU_BAR, DOCK } from "./stage-geometry";
 
+/** The icons are full-bleed artwork; suppress the Dock's default chrome. */
+const ICON = "bg-transparent border-none shadow-none";
+
 /**
  * The MacBook as a stage object: the screen composite, then the frame on top.
  *
@@ -58,15 +61,45 @@ export function MockupScreen() {
           className="pointer-events-none absolute inset-x-0 z-30 flex justify-center"
           style={{ bottom: DOCK.BOTTOM }}
         >
-          <Dock className="pointer-events-auto">
-            <DockIcon icon="/icons/Finder.svg" tooltip="Finder" />
-            <DockIcon icon="/icons/Messages.svg" tooltip="Messages" />
-            <DockIcon icon="/icons/Photos.svg" tooltip="Photos" />
-            <DockIcon icon="/icons/Calendar.svg" tooltip="Calendar" />
-            <DockIcon icon="/icons/Notes.svg" tooltip="Notes" />
-            <DockIcon icon="/icons/Safari.svg" tooltip="Safari" />
+          {/* DU metrics, so the dock scales with the stage rather than
+              staying at the fixed CSS px the other mockups use. */}
+          <Dock className="pointer-events-auto" metrics={DOCK}>
+            <DockIcon
+              icon="/icons/Finder.svg"
+              tooltip="Finder"
+              className={ICON}
+            />
+            <DockIcon
+              icon="/icons/Messages.svg"
+              tooltip="Messages"
+              className={ICON}
+            />
+            <DockIcon
+              icon="/icons/Photos.svg"
+              tooltip="Photos"
+              className={ICON}
+            />
+            <DockIcon
+              icon="/icons/Calendar.svg"
+              tooltip="Calendar"
+              className={ICON}
+            />
+            <DockIcon
+              icon="/icons/Notes.svg"
+              tooltip="Notes"
+              className={ICON}
+            />
+            <DockIcon
+              icon="/icons/Safari.svg"
+              tooltip="Safari"
+              className={ICON}
+            />
             <DockSeparator />
-            <DockIcon icon="/icons/Stasis.svg" tooltip="Stasis" />
+            <DockIcon
+              icon="/icons/Stasis.svg"
+              tooltip="Stasis"
+              className={ICON}
+            />
           </Dock>
         </div>
       </StageLayer>
