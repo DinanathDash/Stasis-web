@@ -102,9 +102,15 @@ export function useStageFit({
     // Open at the height the mockup has in production rather than centred.
     // Read the computed position rather than re-testing the media query, so
     // this can never disagree with the CSS about whether we are degraded.
+    //
+    // The optical nudge has to come back out here. `.stageBase` renders as
+    // `scale(s) translateY(DY)`, so its top edge lands at (DY - STAGE_H/2) * s
+    // from the stage's centre, not at -STAGE_H/2 * s. Positioning off the
+    // box centre alone leaves the frame DY*s too low — ~31px at the default
+    // fit, which is exactly the gap against production.
     const pinned = getComputedStyle(pin).position === "sticky";
     restOffsetRef.current = pinned
-      ? SCENE_REST_TOP + (STAGE_H * s) / 2 - height / 2
+      ? SCENE_REST_TOP + (STAGE_H / 2 - STAGE_OPTICAL_DY) * s - height / 2
       : 0;
     pin.style.setProperty(
       "--stage-rest-offset",
