@@ -10,6 +10,7 @@ import {
 } from "motion/react";
 
 import { cn } from "@/lib/utils";
+import { scrollToY } from "@/lib/scroll/lenis-instance";
 
 export type ScrollProgressSection = { id: string; label: string };
 
@@ -164,8 +165,7 @@ const ScrollProgress = ({
 
       // Delay scrolling to allow accordion layout shift to complete
       setTimeout(() => {
-        const y = el.getBoundingClientRect().top + window.scrollY - 100;
-        window.scrollTo({ top: y, behavior: reduceMotion ? "auto" : "smooth" });
+        scrollToY(el, { offset: -100, immediate: !!reduceMotion });
       }, 250);
     }
   };

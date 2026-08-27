@@ -5,6 +5,7 @@ import "./globals.css";
 import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
 import { AssetPreloader } from "@/components/providers/asset-preloader";
+import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 import { seoMetadata, siteConfig } from "@/lib/seo";
 
 export const metadata: Metadata = seoMetadata;
@@ -59,7 +60,9 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <Header />
-        <div className="flex-grow">{children}</div>
+        <SmoothScrollProvider>
+          <div className="flex-grow">{children}</div>
+        </SmoothScrollProvider>
         <Footer />
         <AssetPreloader />
       </body>

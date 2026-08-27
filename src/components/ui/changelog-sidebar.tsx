@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import LineSidebar from "../motion/LineSidebar";
+import { scrollToY } from "@/lib/scroll/lenis-instance";
 
 export function ChangelogSidebar({ versions }: { versions: string[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -51,11 +52,20 @@ export function ChangelogSidebar({ versions }: { versions: string[] }) {
     };
   }, [versions]);
 
-  // Keep active item in view within the sidebar
+  // Keep active item in view within the sidebar.
+  //
+  // Scrolls the sidebar's own container directly rather than using
+  // scrollIntoView({ block: "nearest" }) — that walks every scrollable
+  // ancestor including the document, so an off-screen item would smooth-scroll
+  // the page and fight Lenis for control of the scroll position.
   useEffect(() => {
-    const activeEl = document.querySelector(`li[aria-current="true"]`);
-    if (activeEl) {
-      activeEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    const item = document.querySelector<HTMLElement>('li[aria-current="true"]');
+    const box = item?.offsetParent as HTMLElement | null;
+    if (!item || !box) return;
+
+    const top = item.offsetTop - box.scrollTop;
+    if (top < 0 || top + item.offsetHeight > box.clientHeight) {
+      box.scrollTop = item.offsetTop - box.clientHeight / 2;
     }
   }, [activeIndex]);
 
@@ -84,8 +94,7 @@ export function ChangelogSidebar({ versions }: { versions: string[] }) {
           if (trigger) trigger.click();
 
           setTimeout(() => {
-            const y = el.getBoundingClientRect().top + window.scrollY - 100;
-            window.scrollTo({ top: y, behavior: "smooth" });
+            scrollToY(el, { offset: -100 });
           }, 250);
         }
       }}

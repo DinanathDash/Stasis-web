@@ -1,0 +1,130 @@
+/**
+ * Design-unit (DU) grid for the MacBook mockup.
+ *
+ * The stage is a fixed 1454x872 px box that is never resized — it is only ever
+ * transformed. Every size inside it is authored once, in these units, and the
+ * single CSS transform on the stage handles all responsiveness. That is what
+ * keeps the mockup's internal proportions stable at any scale, and what lets
+ * pointer events keep working (CSS transforms are hit-test aware).
+ *
+ * Rule for anything rendered inside the stage: no `sm:`/`md:` variants.
+ * Breakpoint variants resolve against the *viewport*, but the stage is always
+ * 1454 DU wide regardless of viewport, so a `md:` inside it is incoherent.
+ */
+
+/** 1454x872 is exactly 1/4 of public/mockup/mockup.png (5816x3491). */
+export const STAGE_W = 1454;
+export const STAGE_H = 872;
+export const STAGE_AR = STAGE_W / STAGE_H; // 1.66743
+
+/**
+ * The screen cutout, measured from mockup.png's alpha channel rather than
+ * eyeballed. The PNG has a real transparent hole here, carrying the bezel's
+ * own corner radius — which is why the screen layer sits BEHIND the frame.
+ */
+export const SCREEN = { x: 144, y: 20, w: 1165, h: 753 } as const;
+
+/** The notch is baked into the frame image (opaque, DU x667->790, y20->41).
+ *  Do not draw a second one — it would be fully occluded. Exported so the
+ *  menu bar knows which region to keep its items clear of. */
+export const NOTCH = { x: 667, y: 20, w: 123, h: 21 } as const;
+
+/**
+ * The screen's centre sits 39.5 DU above the frame's centre. Applied once on
+ * the base node as `scale(s) translateY(39.5px)` — transform functions apply
+ * right-to-left, so the nudge lands in already-scaled space and stays correct
+ * at every scale without ever being animated.
+ */
+export const STAGE_OPTICAL_DY = STAGE_H / 2 - (SCREEN.y + SCREEN.h / 2); // 39.5
+
+/** Tailwind `max-w-6xl`, what the mockup renders at today. Capping the base
+ *  fit here keeps the resting composition byte-identical to the old layout. */
+export const START_MAX_W = 1152;
+
+/** CSS px -> DU at the width the current design was tuned for. Every legacy
+ *  `md:` value was multiplied by this to produce the DU values below. */
+export const DU_PER_CSS_PX = STAGE_W / START_MAX_W; // 1.26215
+
+/** Breathing room between the stage and the pinned viewport's edges. */
+export const STAGE_GUTTER_X = 32;
+export const STAGE_GUTTER_Y = 40;
+
+// ---------------------------------------------------------------------------
+// Scene choreography — the two knobs that define the end composition.
+// ---------------------------------------------------------------------------
+
+/** Rendered stage width as a fraction of viewport width, at full scroll. */
+export const SCENE_END_WIDTH_VW = 1.1;
+/** Where the stage's right edge lands, as a fraction of viewport width.
+ *  Everything to the right of this is the free slot for copy. */
+export const SCENE_END_RIGHT_VW = 0.62;
+
+/**
+ * Resolve the scroll-driven targets. `k` multiplies the base scale (so the
+ * timeline runs 1 -> k), `x` is in real screen px because `translate(x)
+ * scale(k)` translates in the parent's coordinate space.
+ *
+ * The bleed is deliberately asymmetric: hard off the left, slight off the top
+ * and bottom, and a hard stop before the right. That is what reconciles
+ * "grows past the viewport edges" with "leaves the right side free".
+ */
+export function computeSceneTargets(baseScale: number, vw: number) {
+  const endScale = (SCENE_END_WIDTH_VW * vw) / STAGE_W;
+  return {
+    k: baseScale > 0 ? endScale / baseScale : 1,
+    x: (SCENE_END_RIGHT_VW - SCENE_END_WIDTH_VW / 2 - 0.5) * vw,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Component tokens, in DU.
+// ---------------------------------------------------------------------------
+
+/** macOS menu bar. 24 DU against 11.5 DU text preserves the 47% ratio the
+ *  old `h-[3.2%]` + `text-[9px]` pairing produced. */
+export const MENU_BAR = {
+  H: 24,
+  PAD_X: 25,
+  TEXT: 11.5,
+  GAP_LEFT: 20,
+  GAP_RIGHT: 10,
+  GAP_TIGHT: 7.5,
+  ICON_SM: 10, // battery
+  ICON_MD: 12.5, // apple logo
+  ICON_LG: 15, // wifi, search, control centre
+} as const;
+
+/**
+ * Dock. Derived from the old fixed-px dock (h-60, icons 40->64, range 150)
+ * scaled by 1.15 so icons land at ~46 DU — which is both what the reference
+ * screenshot measures and what real macOS works out to (a 56pt icon on a
+ * 1512pt screen maps to ~43 DU on this 1165 DU screen).
+ *
+ * MAG_RANGE is in DU, so the pointer distance must be converted from viewport
+ * px into DU before it is compared against it. See dock.tsx.
+ */
+export const DOCK = {
+  H: 70,
+  ICON_BASE: 46,
+  ICON_MAX: 74,
+  MAG_RANGE: 175,
+  GAP: 9,
+  PAD_X: 14,
+  PAD_Y: 9,
+  RADIUS: 18,
+  ICON_RADIUS: 11.5,
+  SEP_W: 2.3,
+  SEP_H: 46,
+  SEP_MX: 4.6,
+  BOTTOM: 20,
+  TOOLTIP_OFFSET: 44,
+  TOOLTIP_TEXT: 14,
+} as const;
+
+/** Screen-local rects for the Stasis UI layers, measured off
+ *  static-screen.png. Not rendered yet — seeds for the next phase, when the
+ *  settings window and menu-bar popover become their own StageLayers. */
+export const STASIS_LAYERS = {
+  settingsWindow: { x: 285, y: 136, w: 595, h: 437 },
+  menuPopover: { x: 923, y: 24, w: 233, h: 323 },
+} as const;

@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# high-resolution art sources kept locally; the optimised exports are committed
+*-source.png

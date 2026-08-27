@@ -51,3 +51,38 @@ export const SPRING_GLIDE = {
   damping: 50,
   mass: 0.5,
 } as const;
+
+// ---------------------------------------------------------------------------
+// GSAP / Lenis scroll tokens.
+//
+// Everything above feeds framer-motion and uses cubic-bezier arrays. GSAP
+// does not consume that form — passing it an array silently falls back to
+// power1.out. The eases below are GSAP ease *strings*; keep the two families
+// apart.
+// ---------------------------------------------------------------------------
+
+/**
+ * ScrollTrigger scrub, deliberately low.
+ *
+ * Lenis already smooths the scroll *position*; scrub smooths the animation's
+ * *pursuit* of that position. Stacking both aggressively compounds latency
+ * and reads as mush rather than silk. 0.4–0.6 is where they complement.
+ */
+export const SCRUB_SCENE = 0.5;
+
+/** Growth of the pinned mockup through the scene. */
+export const SCENE_EASE_GROW = "power2.inOut";
+/** Leftward drift, entering as a second beat after the growth starts. */
+export const SCENE_EASE_DRIFT = "power3.out";
+/** Where the drift joins the timeline, as a fraction of the pin. */
+export const SCENE_DRIFT_OFFSET = 0.12;
+
+export const LENIS_OPTIONS = {
+  lerp: 0.1,
+  smoothWheel: true,
+  /** Native momentum on touch — smoothed touch scrolling is widely disliked. */
+  syncTouch: false,
+  /** Anchor handling is routed through `scrollToY` instead. */
+  anchors: false,
+  autoResize: true,
+} as const;

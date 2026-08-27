@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { siApple } from "simple-icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { DownloadDialog } from "@/components/ui/download-dialog";
+import { scrollToY } from "@/lib/scroll/lenis-instance";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -23,7 +24,7 @@ export function Header() {
   ) => {
     if (pathname === href) {
       e.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToY(0);
     }
   };
 
@@ -31,7 +32,7 @@ export function Header() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll(); // initialize on mount
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);

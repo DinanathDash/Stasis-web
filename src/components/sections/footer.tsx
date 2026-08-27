@@ -6,6 +6,7 @@ import { Mail, FileText, ShieldCheck } from "lucide-react";
 import { siGithub, siX } from "simple-icons";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { scrollToY } from "@/lib/scroll/lenis-instance";
 
 export function Footer() {
   const pathname = usePathname();
@@ -16,7 +17,7 @@ export function Footer() {
   ) => {
     if (pathname === href) {
       e.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToY(0);
     }
   };
 

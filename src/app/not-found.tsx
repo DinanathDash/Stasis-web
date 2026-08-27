@@ -14,7 +14,8 @@ export default function NotFound() {
           alt="404 Background"
           fill
           className="object-cover opacity-60"
-          priority
+          loading="eager"
+          fetchPriority="high"
         />
         {/* Gradient overlay to ensure text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50" />

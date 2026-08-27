@@ -17,12 +17,9 @@ import {
   useState,
 } from "react";
 import { ProtectedImage } from "@/components/ui/protected-image";
-import clsx from "clsx";
-import { twMerge } from "tailwind-merge";
-
-function cn(...inputs: (string | undefined | null | false)[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from "@/lib/utils";
+import { useStageScale } from "@/components/sections/mockup/stage-context";
+import { DOCK } from "@/components/sections/mockup/stage-geometry";
 
 export function Dock({
   children,
@@ -38,9 +35,16 @@ export function Dock({
       onMouseMove={(e) => mouseX.set(e.clientX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       className={cn(
-        "flex h-[60px] items-end gap-2 rounded-2xl border border-white/20 bg-white/20 backdrop-blur-2xl px-3 py-2 shadow-2xl",
+        "flex items-end border border-white/20 bg-white/20 shadow-2xl backdrop-blur-2xl",
         className,
       )}
+      style={{
+        height: DOCK.H,
+        gap: DOCK.GAP,
+        borderRadius: DOCK.RADIUS,
+        paddingInline: DOCK.PAD_X,
+        paddingBlock: DOCK.PAD_Y,
+      }}
     >
       {Children.map(children, (child) => {
         if (child) {
@@ -71,14 +75,35 @@ export function DockIcon({
   const defaultMouseX = useMotionValue(Infinity);
   const activeMouseX = mouseX ?? defaultMouseX;
   const ref = useRef<HTMLDivElement>(null);
+  const stageScale = useStageScale();
 
+  /**
+   * Two coordinate spaces meet here, and only one of them needs converting.
+   *
+   * `clientX` and `getBoundingClientRect()` are both post-transform viewport
+   * px, so the raw distance shrinks and grows with the stage's scale — while
+   * MAG_RANGE is authored in design units. Left unconverted, the
+   * magnification field narrows as the mockup grows (only the hovered icon
+   * reacts) and widens as it shrinks (every icon lifts at once). Divide.
+   *
+   * The width range below is the opposite case and must NOT be divided: it is
+   * set as CSS `width`, which already lives in the local design space that the
+   * stage transform then scales.
+   */
   const distance = useTransform(activeMouseX, (val: number) => {
-    const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
-    return val - bounds.x - bounds.width / 2;
+    const el = ref.current;
+    if (!el) return Infinity;
+    const bounds = el.getBoundingClientRect();
+    return (val - bounds.x - bounds.width / 2) / (stageScale.current || 1);
   });
 
-  // Base size 40, max size 64, range 150px
-  const widthSync = useTransform(distance, [-150, 0, 150], [40, 64, 40]);
+  const widthSync = useTransform(
+    distance,
+    [-DOCK.MAG_RANGE, 0, DOCK.MAG_RANGE],
+    // Annotated because DOCK is `as const`, which would otherwise infer the
+    // output range as the literal union `46 | 74`.
+    [DOCK.ICON_BASE, DOCK.ICON_MAX, DOCK.ICON_BASE] as number[],
+  );
   const width = useSpring(widthSync, {
     mass: 0.1,
     stiffness: 300,
@@ -92,14 +117,15 @@ export function DockIcon({
       ref={ref}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="relative flex items-end justify-center aspect-square shrink-0 will-change-[width]"
+      className="relative flex aspect-square shrink-0 items-end justify-center will-change-[width]"
       style={{ width, WebkitTransform: "translateZ(0)" }}
     >
       <div
         className={cn(
-          "w-full h-full rounded-[10px] cursor-pointer flex items-center justify-center overflow-hidden border border-white/10 bg-transparent will-change-transform",
+          "flex h-full w-full cursor-pointer items-center justify-center overflow-hidden bg-transparent will-change-transform",
           className,
         )}
+        style={{ borderRadius: DOCK.ICON_RADIUS }}
       >
         {icon ? (
           <ProtectedImage
@@ -107,7 +133,7 @@ export function DockIcon({
             alt={tooltip}
             width={64}
             height={64}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
             unoptimized
           />
         ) : (
@@ -122,10 +148,16 @@ export function DockIcon({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 2, scale: 0.8 }}
             transition={{ duration: 0.15 }}
-            className="absolute -top-[38px] px-3 py-1 bg-[#1a1a1a]/90 text-white text-[12px] tracking-wide rounded-full whitespace-nowrap border border-white/10 shadow-2xl z-50 pointer-events-none"
+            className="pointer-events-none absolute z-50 whitespace-nowrap rounded-full border border-white/10 bg-[#1a1a1a]/90 tracking-wide text-white shadow-2xl"
+            style={{
+              top: -DOCK.TOOLTIP_OFFSET,
+              fontSize: DOCK.TOOLTIP_TEXT,
+              paddingInline: DOCK.PAD_X,
+              paddingBlock: DOCK.PAD_Y / 2,
+            }}
           >
             {tooltip}
-            <div className="absolute -bottom-[4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-[#1a1a1a]/80 border-b border-r border-white/10 rotate-45 rounded-[1px] -z-10"></div>
+            <div className="absolute -bottom-[4px] left-1/2 -z-10 h-2 w-2 -translate-x-1/2 rotate-45 rounded-[1px] border-b border-r border-white/10 bg-[#1a1a1a]/80"></div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -135,6 +167,13 @@ export function DockIcon({
 
 export function DockSeparator() {
   return (
-    <div className="w-[2px] h-10 mx-1 bg-white/30 rounded-full shrink-0" />
+    <div
+      className="shrink-0 rounded-full bg-white/30"
+      style={{
+        width: DOCK.SEP_W,
+        height: DOCK.SEP_H,
+        marginInline: DOCK.SEP_MX,
+      }}
+    />
   );
 }

@@ -1,0 +1,127 @@
+/**
+ * Scene layout.
+ *
+ * The scene height lives here rather than being computed by ScrollTrigger's
+ * `pin`, so it is known at first paint and contributes zero layout shift —
+ * which matters when you are inserting ~280svh into the middle of a page.
+ * ScrollTrigger is used purely as a value source; `position: sticky` does the
+ * pinning.
+ */
+
+.scene {
+  --scene-scroll: 180svh;
+  --scene-header-bias: 24px;
+
+  position: relative;
+  width: 100%;
+  height: calc(100svh + var(--scene-scroll));
+  z-index: 10; /* must stay below the sticky header's z-50 */
+  isolation: isolate;
+}
+
+.pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+
+  /*
+   * `clip`, not `hidden`. The stage is a fixed 1454px box, so it overflows
+   * horizontally on any narrower viewport and must be clipped. `hidden` would
+   * make this a scrollable box — once the stage bleeds off-screen with
+   * focusable dock icons inside it, tabbing to one would scroll this box and
+   * shift the whole composition. `clip` cannot scroll.
+   *
+   * `hidden` first as a fallback: Safari only learned `clip` in 16, and there
+   * the unsupported declaration would be dropped, leaving the 1454px stage to
+   * overflow the document horizontally.
+   */
+  overflow: hidden;
+  overflow: clip;
+}
+
+/*
+ * `svh`, not `vh` or `dvh`. `dvh` resizes as a mobile URL bar hides, which
+ * would resize the sticky box mid-scroll and jitter the scene; `vh` on iOS is
+ * the large viewport and overflows.
+ */
+
+/* Zero-size box at the optical centre. Everything scales about this one
+ * point, which is why no `transform-origin` is declared anywhere. */
+.stageViewport {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  margin-top: var(--scene-header-bias);
+}
+
+/* GSAP owns this node's transform. Nothing else may write to it. */
+.stageScroll {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* Promoted only while the scene is actually on screen. A persistent
+ * will-change costs layer memory for no gain here (GSAP mutates transform
+ * from JS every frame, so the compositor re-rasterises regardless) and can
+ * lock Chrome's raster scale, permanently softening the text. */
+.stageScroll.active {
+  will-change: transform;
+}
+
+/* The page's slot, deliberately OUTSIDE the transformed subtree: copy in here
+ * keeps normal CSS px and normal responsive rules. Text that grew from 8px to
+ * 22px as you scrolled would be a bug, not a design. */
+.aside {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 38%;
+  display: flex;
+  align-items: center;
+  padding-inline: clamp(1.5rem, 3vw, 3.5rem);
+  padding-right: clamp(1.5rem, 4vw, 5rem);
+}
+
+/* Hidden until the timeline reveals them. Kept here rather than as a utility
+ * class on the elements so it cannot outlive the animation that clears it —
+ * in the degraded branch below, `.aside` is display:none and this never
+ * applies. GSAP's autoAlpha writes inline styles, which win over this. */
+.aside [data-aside-item] {
+  opacity: 0;
+}
+
+/*
+ * Degrade below md, and for reduced motion.
+ *
+ * The breakpoint mirrors SCENE_MQ in mockup-scene.tsx — keep them in sync.
+ *
+ * Note this collapses the scene's height rather than only freezing the
+ * animation: leaving ~180svh of dead scroll with nothing happening in it is
+ * worse than having no scene at all.
+ */
+@media (max-width: 767px), (prefers-reduced-motion: reduce) {
+  .scene {
+    height: auto;
+    padding-block: 4rem;
+  }
+
+  /* `relative`, not `static` — the stage nodes are absolutely positioned and
+   * still need this as their containing block. */
+  .pin {
+    position: relative;
+    height: auto;
+    aspect-ratio: 1454 / 872;
+  }
+
+  .stageViewport {
+    margin-top: 0;
+  }
+
+  .aside {
+    display: none;
+  }
+}
