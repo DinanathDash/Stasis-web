@@ -1,14 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { ProtectedImage } from "@/components/ui/protected-image";
-import { AnimatePresence } from "framer-motion";
-import { StartupScreen } from "./screens/startup-screen";
-import { LoginScreen } from "./screens/login-screen";
 import { MainScreen } from "./screens/main-screen";
 import { HandwrittenNote } from "@/components/ui/handwritten-note";
-
-type ScreenState = "splash" | "login" | "main";
 
 /**
  * The mockup itself — note, frame and the interactive screen — with no page
@@ -19,10 +13,15 @@ type ScreenState = "splash" | "login" | "main";
  * stage via `StagedAnimatedMockup`. Everything in here is authored in CSS px
  * against a 1152px-wide box; the stage reproduces that by scaling the whole
  * subtree rather than rewriting the values inside it.
+ *
+ * The boot sequence is currently switched off: this opens straight on
+ * `MainScreen` rather than running splash -> login -> main. `startup-screen`
+ * and `login-screen` are still in ./screens if we want them back — restore
+ * them by reinstating the `ScreenState` machine and passing `onLock` to
+ * MainScreen. Without `onLock`, clicking the Apple menu still plays its sound
+ * but no longer locks.
  */
 export function AnimatedMockupBody() {
-  const [currentScreen, setCurrentScreen] = useState<ScreenState>("splash");
-
   return (
     <div className="w-full relative group">
       {/* Handwritten Note pointing to the screen */}
@@ -62,22 +61,7 @@ export function AnimatedMockupBody() {
           zIndex: 0,
         }}
       >
-        <AnimatePresence mode="wait">
-          {currentScreen === "splash" && (
-            <StartupScreen
-              key="splash"
-              onComplete={() => setCurrentScreen("login")}
-            />
-          )}
-
-          {currentScreen === "login" && (
-            <LoginScreen key="login" onLogin={() => setCurrentScreen("main")} />
-          )}
-
-          {currentScreen === "main" && (
-            <MainScreen key="main" onLock={() => setCurrentScreen("login")} />
-          )}
-        </AnimatePresence>
+        <MainScreen />
       </div>
     </div>
   );
