@@ -13,7 +13,6 @@ import styles from "./mockup-scene.module.css";
 import { StageNodes, useStageFit } from "./design-stage";
 import { StageScaleProvider } from "./stage-context";
 import { SceneProvider } from "./scene-context";
-import { MockupScreen } from "./mockup-screen";
 import { computeSceneTargets } from "./stage-geometry";
 
 /**
@@ -34,8 +33,19 @@ const SCREEN_LIVE_AT = 0.98;
  * React's back (a reliable source of `removeChild` errors on Fast Refresh),
  * and would compute the scene's height after hydration instead of at first
  * paint.
+ *
+ * `device` is whatever sits on the stage — the scene does not care which
+ * mockup it is animating. Anything rendered there is in design units and
+ * scales with the scene; anything that should stay at reading size goes in
+ * `aside`, which sits outside the transformed subtree.
  */
-export function MockupScene({ aside }: { aside?: React.ReactNode }) {
+export function MockupScene({
+  device,
+  aside,
+}: {
+  device: React.ReactNode;
+  aside?: React.ReactNode;
+}) {
   const sceneRef = useRef<HTMLElement | null>(null);
   const pinRef = useRef<HTMLDivElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -143,7 +153,7 @@ export function MockupScene({ aside }: { aside?: React.ReactNode }) {
               viewportClassName={styles.stageViewport}
               scrollClassName={styles.stageScroll}
             >
-              <MockupScreen />
+              {device}
             </StageNodes>
           </StageScaleProvider>
 

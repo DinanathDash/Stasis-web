@@ -45,6 +45,24 @@ export const START_MAX_W = 1152;
  *  `md:` value was multiplied by this to produce the DU values below. */
 export const DU_PER_CSS_PX = STAGE_W / START_MAX_W; // 1.26215
 
+/**
+ * The percentage-based mockups (animated-mockup, interactive-mockup,
+ * static-mockup) and their screen components are authored in CSS px against a
+ * `max-w-6xl` box — exactly 1152 x 690.9.
+ *
+ * That box maps onto the stage with a single uniform scale, because
+ * STAGE_W / LEGACY_W is DU_PER_CSS_PX by definition. So one of those mockups
+ * can be mounted on the stage by rendering it at its natural size inside a
+ * LEGACY_W x LEGACY_H box and scaling that box, rather than rewriting every
+ * value inside it into design units.
+ *
+ * Their screen percentages land on SCREEN to within half a design unit:
+ *   left 9.88% -> 143.6 (SCREEN.x 144), width 80.16% -> 1165.5 (SCREEN.w 1165)
+ */
+export const LEGACY_W = START_MAX_W; // 1152
+export const LEGACY_H = STAGE_H / DU_PER_CSS_PX; // 690.9
+export const LEGACY_SCALE = DU_PER_CSS_PX; // 1.26215
+
 /** Breathing room between the stage and the pinned viewport's edges. */
 export const STAGE_GUTTER_X = 32;
 export const STAGE_GUTTER_Y = 40;
