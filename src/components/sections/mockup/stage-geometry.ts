@@ -67,6 +67,26 @@ export const LEGACY_SCALE = DU_PER_CSS_PX; // 1.26215
 export const STAGE_GUTTER_X = 32;
 export const STAGE_GUTTER_Y = 40;
 
+/**
+ * Where the mockup's top edge sits at rest, measured from the top of the pin.
+ *
+ * 96px is the `mt-24` the percentage-based mockups carry, so the scene opens
+ * at exactly the height the mockup has in production. Matching that is
+ * viewport-dependent — a flow-positioned mockup sits a fixed distance below
+ * the hero, whereas a pinned one centres in the viewport — so the scene holds
+ * this position at rest and eases to centred as it pins. See
+ * `restOffsetRef` in design-stage.tsx.
+ */
+export const SCENE_REST_TOP = 96;
+
+/**
+ * How far below the pin's centre the mockup settles once the scene takes
+ * over. Absorbs the sticky header, whose own height flips between 64 and
+ * ~80px when it collapses — chasing that with a sticky `top` would jump at
+ * the moment it changes.
+ */
+export const SCENE_CENTER_BIAS = 24;
+
 // ---------------------------------------------------------------------------
 // Scene choreography — the two knobs that define the end composition.
 // ---------------------------------------------------------------------------

@@ -10,7 +10,6 @@
 
 .scene {
   --scene-scroll: 180svh;
-  --scene-header-bias: 24px;
 
   position: relative;
   width: 100%;
@@ -53,7 +52,11 @@
   top: 50%;
   width: 0;
   height: 0;
-  margin-top: var(--scene-header-bias);
+
+  /* Written by design-stage's `measure`: the offset from the pin's centre
+   * that puts the mockup at the height it has in production. The scene then
+   * tweens it away as it pins. Falls back to centred before hydration. */
+  margin-top: var(--stage-rest-offset, 0px);
 }
 
 /* GSAP owns this node's transform. Nothing else may write to it. */
@@ -117,6 +120,8 @@
     aspect-ratio: 1454 / 872;
   }
 
+  /* `measure` writes 0 here when it sees the pin is no longer sticky, but
+   * pin it explicitly too so the degraded layout is correct before JS runs. */
   .stageViewport {
     margin-top: 0;
   }

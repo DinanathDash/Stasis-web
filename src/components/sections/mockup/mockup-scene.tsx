@@ -8,12 +8,14 @@ import {
   SCENE_EASE_GROW,
   SCENE_EASE_DRIFT,
   SCENE_DRIFT_OFFSET,
+  SCENE_EASE_SETTLE,
+  SCENE_SETTLE_DURATION,
 } from "@/lib/ease";
 import styles from "./mockup-scene.module.css";
 import { StageNodes, useStageFit } from "./design-stage";
 import { StageScaleProvider } from "./stage-context";
 import { SceneProvider } from "./scene-context";
-import { computeSceneTargets } from "./stage-geometry";
+import { computeSceneTargets, SCENE_CENTER_BIAS } from "./stage-geometry";
 
 /**
  * Mirrors the `max-width: 767px` degrade in mockup-scene.module.css.
@@ -54,8 +56,15 @@ export function MockupScene({
 
   const [timeline, setTimeline] = useState<gsap.core.Timeline | null>(null);
 
-  const { viewportRef, baseRef, baseScaleRef, totalScaleRef, measure, sync } =
-    useStageFit({ pinRef, scrollRef });
+  const {
+    viewportRef,
+    baseRef,
+    baseScaleRef,
+    totalScaleRef,
+    restOffsetRef,
+    measure,
+    sync,
+  } = useStageFit({ pinRef, scrollRef });
 
   useGSAP(
     () => {
@@ -78,7 +87,10 @@ export function MockupScene({
             computeSceneTargets(baseScaleRef.current, window.innerWidth);
 
           // Duration normalised to 1 so collaborators can place tweens at a
-          // literal fraction of the pin. See scene-context.tsx.
+          // literal fraction of the pin. See scene-context.tsx. Every tween
+          // below must therefore end at 1, not overrun it — a tween placed at
+          // 0.12 with duration 1 would stretch the timeline to 1.12 and
+          // silently rescale everyone else's placements.
           const tl = gsap.timeline({ defaults: { ease: "none", duration: 1 } });
 
           tl.fromTo(
@@ -86,15 +98,35 @@ export function MockupScene({
             { scale: 1 },
             { scale: () => targets().k, ease: SCENE_EASE_GROW, force3D: true },
             0,
-          ).fromTo(
-            scrollEl,
-            { x: 0 },
-            { x: () => targets().x, ease: SCENE_EASE_DRIFT, force3D: true },
-            // The drift enters as a second beat, after the growth has started.
-            // Baking it into transform-origin instead would make this
-            // retiming impossible.
-            SCENE_DRIFT_OFFSET,
-          );
+          )
+            .fromTo(
+              scrollEl,
+              { x: 0 },
+              {
+                x: () => targets().x,
+                duration: 1 - SCENE_DRIFT_OFFSET,
+                ease: SCENE_EASE_DRIFT,
+                force3D: true,
+              },
+              // The drift enters as a second beat, after the growth has
+              // started. Baking it into transform-origin instead would make
+              // this retiming impossible.
+              SCENE_DRIFT_OFFSET,
+            )
+            .fromTo(
+              scrollEl,
+              { y: 0 },
+              {
+                // The stage rests at production height via the viewport's
+                // margin; this cancels that offset and lands it centred,
+                // biased down to clear the header.
+                y: () => SCENE_CENTER_BIAS - restOffsetRef.current,
+                duration: SCENE_SETTLE_DURATION,
+                ease: SCENE_EASE_SETTLE,
+                force3D: true,
+              },
+              0,
+            );
 
           ScrollTrigger.create({
             trigger: sceneEl,

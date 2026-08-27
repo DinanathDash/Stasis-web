@@ -11,6 +11,7 @@ import {
   START_MAX_W,
   STAGE_GUTTER_X,
   STAGE_GUTTER_Y,
+  SCENE_REST_TOP,
 } from "./stage-geometry";
 
 /**
@@ -47,6 +48,9 @@ export function useStageFit({
   const totalScaleRef = useRef(1);
   /** Cached in `measure` so `sync` never reads layout. See below. */
   const pinWidthRef = useRef(0);
+  /** Offset from the pin's centre that puts the mockup at its production
+   *  height. The scene tweens this away as it pins. 0 when degraded. */
+  const restOffsetRef = useRef(0);
 
   /**
    * Publishes total scale (base x scroll) to both consumers from one place,
@@ -94,6 +98,19 @@ export function useStageFit({
     // scale without ever being animated.
     base.style.transform = `scale(${s}) translateY(${STAGE_OPTICAL_DY}px)`;
     pin.style.setProperty("--stage-base-scale", String(s));
+
+    // Open at the height the mockup has in production rather than centred.
+    // Read the computed position rather than re-testing the media query, so
+    // this can never disagree with the CSS about whether we are degraded.
+    const pinned = getComputedStyle(pin).position === "sticky";
+    restOffsetRef.current = pinned
+      ? SCENE_REST_TOP + (STAGE_H * s) / 2 - height / 2
+      : 0;
+    pin.style.setProperty(
+      "--stage-rest-offset",
+      `${restOffsetRef.current}px`,
+    );
+
     sync();
   }, [pinRef, sync]);
 
@@ -110,7 +127,15 @@ export function useStageFit({
     return () => ro.disconnect();
   }, [pinRef, measure]);
 
-  return { viewportRef, baseRef, baseScaleRef, totalScaleRef, measure, sync };
+  return {
+    viewportRef,
+    baseRef,
+    baseScaleRef,
+    totalScaleRef,
+    restOffsetRef,
+    measure,
+    sync,
+  };
 }
 
 /** Markup for the two inner transform nodes. Kept together with the hook so

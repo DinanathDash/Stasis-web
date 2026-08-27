@@ -77,6 +77,14 @@ export const SCENE_EASE_DRIFT = "power3.out";
 /** Where the drift joins the timeline, as a fraction of the pin. */
 export const SCENE_DRIFT_OFFSET = 0.12;
 
+/**
+ * The mockup opens at its production height and eases to centred over the
+ * first fifth of the pin, before the growth has gone far enough for the shift
+ * to read as movement in its own right.
+ */
+export const SCENE_EASE_SETTLE = "power2.out";
+export const SCENE_SETTLE_DURATION = 0.2;
+
 export const LENIS_OPTIONS = {
   lerp: 0.1,
   smoothWheel: true,
