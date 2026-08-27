@@ -59,6 +59,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)"],
+        caveat: ["var(--font-caveat)"],
       },
       keyframes: {
         "accordion-down": {
