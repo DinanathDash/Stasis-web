@@ -31,6 +31,7 @@ type Release = {
     title: string;
     items: string[];
   }[];
+  isPreRelease?: boolean;
 };
 
 function parseChangelog(content: string): Release[] {
@@ -103,6 +104,27 @@ function parseChangelog(content: string): Release[] {
 
 export default async function ChangelogPage() {
   let releases: Release[] = [];
+  const preReleases = new Set<string>();
+
+  try {
+    const releasesRes = await fetch(
+      "https://api.github.com/repos/DinanathDash/Stasis/releases",
+      {
+        next: { revalidate: 3600 },
+      }
+    );
+    if (releasesRes.ok) {
+      const releasesData = await releasesRes.json();
+      releasesData.forEach((r: { prerelease: boolean; tag_name: string }) => {
+        if (r.prerelease) {
+          const version = r.tag_name.startsWith('v') ? r.tag_name.substring(1) : r.tag_name;
+          preReleases.add(version);
+        }
+      });
+    }
+  } catch (error) {
+    console.error("Failed to fetch GitHub releases:", error);
+  }
 
   try {
     const res = await fetch(
@@ -113,7 +135,10 @@ export default async function ChangelogPage() {
     );
     if (res.ok) {
       const text = await res.text();
-      releases = parseChangelog(text);
+      releases = parseChangelog(text).map(r => ({
+        ...r,
+        isPreRelease: preReleases.has(r.version)
+      }));
     }
   } catch (error) {
     console.error("Failed to fetch changelog:", error);
@@ -177,9 +202,16 @@ export default async function ChangelogPage() {
                   >
                     <AccordionTrigger className="hover:no-underline hover:text-foreground">
                       <div className="flex w-full items-center justify-between text-lg md:text-xl">
-                        <span className="font-bold tracking-tight text-foreground/90">
-                          {release.version}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold tracking-tight text-foreground/90">
+                            {release.version}
+                          </span>
+                          {release.isPreRelease && (
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                              Pre-release
+                            </span>
+                          )}
+                        </div>
                         {release.date && (
                           <span className="text-base text-muted-foreground font-normal tabular-nums">
                             {release.date}
