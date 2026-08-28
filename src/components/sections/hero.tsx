@@ -28,7 +28,7 @@ export async function Hero() {
 
   return (
     <ProtectedBackground
-      src="/background.png"
+      src="/background.webp"
       as="section"
       className="relative w-full flex flex-col items-center text-center pt-16 md:pt-24 pb-20 md:pb-32 px-4 bg-cover bg-center bg-no-repeat"
     >

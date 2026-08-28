@@ -10,7 +10,7 @@ export default function NotFound() {
       {/* Background Image Layer */}
       <div className="absolute inset-0 z-0 flex items-center justify-center">
         <Image
-          src="/background.png"
+          src="/background.webp"
           alt="404 Background"
           fill
           className="object-cover opacity-60"

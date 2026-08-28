@@ -43,7 +43,7 @@ export function Cta() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         {/* Left Side: CTA Card */}
         <ProtectedBackground
-          src="/cta.png"
+          src="/cta.webp"
           className="relative overflow-hidden rounded-3xl bg-black p-6 md:p-10 lg:p-14 text-black shadow-xl h-full flex flex-col justify-center min-h-[350px] lg:min-h-[400px] bg-cover bg-center bg-no-repeat"
         >
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#FBFAF5]"></div>

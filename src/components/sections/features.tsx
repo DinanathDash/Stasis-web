@@ -429,7 +429,7 @@ export function Features() {
             >
               {/* Image Container with dynamic background */}
               <ProtectedBackground
-                src="/cutting-mat.png"
+                src="/cutting-mat.webp"
                 className="bg-cover bg-center bg-no-repeat rounded-[1.5rem] aspect-[4/3] mb-6 relative overflow-hidden"
               >
                 {feature.placeholder}

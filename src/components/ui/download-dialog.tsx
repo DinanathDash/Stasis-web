@@ -146,8 +146,13 @@ export function DownloadDialog({ isOpen, onClose }: DownloadDialogProps) {
               </div>
 
               {/* Main Content Area */}
+              {/* See ProtectedBackground for why these are WebP, not AVIF.
+                  2400x1600 / 6.6MB -> 1800x1200 / 215KB, for a box that is at
+                  most 600px wide. It matters most here: this element only
+                  mounts when the dialog opens, so the download used to start
+                  on the click. */}
               <ProtectedBackground
-                src="/dmg/dmg-background.png"
+                src="/dmg/dmg-background.webp"
                 className="relative h-[440px] md:h-[340px] w-full overflow-hidden bg-[#E7E7E7] bg-cover bg-center"
               >
                 {/* Gradient overlay */}
