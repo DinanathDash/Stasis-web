@@ -1,11 +1,11 @@
 /**
- * Scene layout.
+ * Scene layout. The height lives here rather than being computed by
+ * ScrollTrigger's `pin`, so it is known at first paint and costs zero layout
+ * shift — which matters when inserting ~280svh into the middle of a page.
+ * ScrollTrigger is only a value source; `position: sticky` does the pinning.
  *
- * The scene height lives here rather than being computed by ScrollTrigger's
- * `pin`, so it is known at first paint and contributes zero layout shift —
- * which matters when you are inserting ~280svh into the middle of a page.
- * ScrollTrigger is used purely as a value source; `position: sticky` does the
- * pinning.
+ * `svh`, not `vh` or `dvh`: `dvh` resizes as a mobile URL bar hides, which
+ * would resize the sticky box mid-scroll; `vh` on iOS is the large viewport.
  */
 
 .scene {
@@ -23,49 +23,23 @@
   top: 0;
   height: 100svh;
 
-  /*
-   * `clip`, not `hidden`. The stage is a fixed 1454px box, so it overflows
-   * horizontally on any narrower viewport and must be clipped. `hidden` would
-   * make this a scrollable box — once the stage bleeds off-screen with
-   * focusable dock icons inside it, tabbing to one would scroll this box and
-   * shift the whole composition. `clip` cannot scroll.
-   *
-   * `hidden` first as a fallback: Safari only learned `clip` in 16, and there
-   * the unsupported declaration would be dropped, leaving the 1454px stage to
-   * overflow the document horizontally.
-   */
+  /* `clip`, not `hidden`: the stage is a fixed 1454px box and must be clipped,
+   * but `hidden` would make this a scroll container, so tabbing to a dock icon
+   * that had bled off-screen would shift the whole composition. `hidden` first
+   * as a fallback for Safari < 16. */
   overflow: hidden;
   overflow: clip;
 
-  /*
-   * Let ink — not layout — escape the clip edge.
-   *
-   * The frame carries `drop-shadow(0 20px 50px)`, which reaches ~95 legacy px
-   * below the machine and scales with the scene. Clipping at the pin's own box
-   * slices that gradient off mid-falloff, which is invisible during the pin
-   * (the edge coincides with the bottom of the viewport) but becomes a hard
-   * horizontal line across the page as the sticky box releases and scrolls up
-   * past the next section.
-   *
-   * `overflow-clip-margin` only moves the *paint* boundary. It cannot produce
-   * a scrollbar: `clip` is not a scroll container, and the escaping ink is off
-   * the left edge, which never contributes to scrollable overflow in LTR.
-   *
-   * Tuned to clear the shadow without letting the machine itself spill onto
-   * the neighbouring sections on short viewports, where the composition is
-   * already close to the pin's bottom edge.
-   */
+  /* Let ink — not layout — escape the clip edge. The frame's drop-shadow
+   * reaches ~95 legacy px below the machine, and clipping at the pin's own box
+   * sliced it off mid-falloff: invisible during the pin, but a hard horizontal
+   * line once the sticky box releases and scrolls past the next section. This
+   * moves only the paint boundary, so it cannot produce a scrollbar. */
   overflow-clip-margin: 8rem;
 }
 
-/*
- * `svh`, not `vh` or `dvh`. `dvh` resizes as a mobile URL bar hides, which
- * would resize the sticky box mid-scroll and jitter the scene; `vh` on iOS is
- * the large viewport and overflows.
- */
-
-/* Zero-size box at the optical centre. Everything scales about this one
- * point, which is why no `transform-origin` is declared anywhere. */
+/* Zero-size box at the optical centre. Everything scales about this one point,
+ * which is why no `transform-origin` is declared anywhere. */
 .stageViewport {
   position: absolute;
   left: 50%;
@@ -73,9 +47,8 @@
   width: 0;
   height: 0;
 
-  /* Written by design-stage's `measure`: the offset from the pin's centre
-   * that puts the mockup at the height it has in production. The scene then
-   * tweens it away as it pins. Falls back to centred before hydration. */
+  /* Written by design-stage's `measure`: the offset that puts the mockup at
+   * production height. The scene eases it away on the approach. */
   margin-top: var(--stage-rest-offset, 0px);
 }
 
@@ -86,17 +59,15 @@
   top: 0;
 }
 
-/* Promoted only while the scene is actually on screen. A persistent
- * will-change costs layer memory for no gain here (GSAP mutates transform
- * from JS every frame, so the compositor re-rasterises regardless) and can
- * lock Chrome's raster scale, permanently softening the text. */
+/* Promoted only while the scene is on screen. A persistent will-change buys
+ * nothing here (GSAP mutates transform from JS every frame anyway) and can lock
+ * Chrome's raster scale, permanently softening the text. */
 .stageScroll.active {
   will-change: transform;
 }
 
-/* The page's slot, deliberately OUTSIDE the transformed subtree: copy in here
- * keeps normal CSS px and normal responsive rules. Text that grew from 8px to
- * 22px as you scrolled would be a bug, not a design. */
+/* The page's slot, deliberately OUTSIDE the transformed subtree, so copy keeps
+ * normal CSS px. Text growing from 8px to 22px as you scroll is a bug. */
 .aside {
   position: absolute;
   right: 0;
@@ -108,36 +79,23 @@
   padding-inline: clamp(1.5rem, 3vw, 3.5rem);
   padding-right: clamp(1.5rem, 4vw, 5rem);
 
-  /*
-   * This box covers the right 38% of the pin, which at rest sits directly over
-   * the top-right of the mockup — where the interactive battery pill lives.
-   * Without this it silently swallows those clicks until the mockup has
-   * drifted far enough left to escape, which reads as "only clickable once
-   * you have scrolled".
-   *
-   * The copy here is not interactive. Anything added that IS must set
-   * `pointer-events: auto` on itself, not on this container.
-   */
+  /* At rest this box sits over the mockup's battery pill and would swallow its
+   * clicks, which reads as "only clickable once you have scrolled". Anything
+   * added here that IS interactive sets `pointer-events: auto` on itself. */
   pointer-events: none;
 }
 
-/* Hidden until the timeline reveals them. Kept here rather than as a utility
- * class on the elements so it cannot outlive the animation that clears it —
- * in the degraded branch below, `.aside` is display:none and this never
- * applies. GSAP's autoAlpha writes inline styles, which win over this. */
+/* Hidden until the timeline reveals them. Here rather than on the elements so
+ * it cannot outlive the animation that clears it — in the degraded branch
+ * `.aside` is display:none and this never applies. */
 .aside [data-aside-item] {
   opacity: 0;
 }
 
-/*
- * Degrade below md, and for reduced motion.
- *
- * The breakpoint mirrors SCENE_MQ in mockup-scene.tsx — keep them in sync.
- *
- * Note this collapses the scene's height rather than only freezing the
- * animation: leaving ~180svh of dead scroll with nothing happening in it is
- * worse than having no scene at all.
- */
+/* Degrade below md and for reduced motion. The breakpoint mirrors SCENE_MQ in
+ * mockup-scene.tsx — keep them in sync. This collapses the scene's height
+ * rather than only freezing the animation: ~180svh of dead scroll with nothing
+ * happening in it is worse than having no scene at all. */
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .scene {
     height: auto;
@@ -152,8 +110,8 @@
     aspect-ratio: 1454 / 872;
   }
 
-  /* `measure` writes 0 here when it sees the pin is no longer sticky, but
-   * pin it explicitly too so the degraded layout is correct before JS runs. */
+  /* `measure` writes 0 here too, but set it explicitly so the degraded layout
+   * is correct before JS runs. */
   .stageViewport {
     margin-top: 0;
   }

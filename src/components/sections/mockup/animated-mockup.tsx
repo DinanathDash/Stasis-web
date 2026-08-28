@@ -5,21 +5,17 @@ import { MainScreen } from "./screens/main-screen";
 import { HandwrittenNote } from "@/components/ui/handwritten-note";
 
 /**
- * The mockup itself — note, frame and the interactive screen — with no page
- * layout of its own.
+ * The mockup itself — note, frame and interactive screen — with no page layout
+ * of its own, so `StagedAnimatedMockup` can mount it on the scene's stage.
  *
- * Split out from `AnimatedMockup` so the same markup can be mounted two ways:
- * directly in the page flow (below), or on the scroll scene's design-unit
- * stage via `StagedAnimatedMockup`. Everything in here is authored in CSS px
- * against a 1152px-wide box; the stage reproduces that by scaling the whole
- * subtree rather than rewriting the values inside it.
+ * Everything here is authored in CSS px against a 1152px-wide box; the stage
+ * reproduces that by scaling the whole subtree rather than rewriting the values
+ * inside it.
  *
- * The boot sequence is currently switched off: this opens straight on
- * `MainScreen` rather than running splash -> login -> main. `startup-screen`
- * and `login-screen` are still in ./screens if we want them back — restore
- * them by reinstating the `ScreenState` machine and passing `onLock` to
- * MainScreen. Without `onLock`, clicking the Apple menu still plays its sound
- * but no longer locks.
+ * There is no boot sequence: this opens straight on `MainScreen`. The splash
+ * and login screens were removed (see git history) along with the `ScreenState`
+ * machine and `onLock`, so clicking the Apple menu plays its sound but does not
+ * lock.
  */
 export function AnimatedMockupBody({
   batteryOpen,
@@ -32,9 +28,7 @@ export function AnimatedMockupBody({
 } = {}) {
   return (
     <div className="w-full relative group">
-      {/* Handwritten Note pointing to the screen. `data-mockup-note` is the
-          handle the scroll scene uses to relocate it as the mockup zooms;
-          keep it if you move this. */}
+      {/* `data-mockup-note` is the handle the scene fades this out by. */}
       <div
         data-mockup-note
         className="absolute -top-26 right-4 md:-right-20 z-50 hidden md:block"
@@ -78,17 +72,6 @@ export function AnimatedMockupBody({
           batteryOpen={batteryOpen}
           onBatteryOpenChange={onBatteryOpenChange}
         />
-      </div>
-    </div>
-  );
-}
-
-/** The mockup as a standalone page section, sized by the viewport. */
-export function AnimatedMockup() {
-  return (
-    <div className="mt-24 w-full flex justify-center px-4 md:px-12 relative z-10 select-none">
-      <div className="w-full max-w-6xl">
-        <AnimatedMockupBody />
       </div>
     </div>
   );

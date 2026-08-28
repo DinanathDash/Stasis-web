@@ -13,18 +13,11 @@ import { chipLay1Sound } from "@/lib/chip-lay-1";
 interface MainScreenProps {
   onLock?: () => void;
   /**
-   * Whether the battery popover is open.
-   *
-   * Optional, and its presence is the switch between two modes. Left out, the
-   * screen owns the state itself and behaves like any standalone mockup. Given
-   * — as the scroll scene gives it — the screen is fully controlled and the
-   * owner decides, which is what lets the scene both open the popover as a
-   * demonstration and reset it when the reader returns to the hero.
-   *
-   * An earlier version had the screen keep a "the viewer has touched this"
-   * override that outranked the scene forever. It made the popover impossible
-   * to reopen: close it once and no amount of scrolling brought it back. One
-   * owner is the fix.
+   * Whether the battery popover is open. Its presence is the switch between
+   * two modes: left out, the screen owns the state; given, the caller does.
+   * The scene needs the latter so it can both demonstrate the popover and
+   * reset one the reader shut by hand — an earlier version kept a local
+   * "viewer has touched this" override, which made it impossible to reopen.
    */
   batteryOpen?: boolean;
   /** Fires for every open and close the screen itself initiates. */
@@ -76,17 +69,10 @@ export function MainScreen({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      {/*
-        The AVIF, not the PNG beside it. Both are the same wallpaper, but the
-        PNG is 1280x720 — narrower than this box renders at full zoom on any
-        modern display, so it was being upscaled. The AVIF is 3200x1800 and
-        still a fifth of the file size.
-
-        `sizes` is explicit because this box is nowhere near the viewport's
-        width: the screen cutout is ~62vw at full zoom and ~64vw at rest.
-        Inheriting the `fill` default of 100vw made Next both fetch a source a
-        third too large and warn about it on every dev request.
-      */}
+      {/* AVIF at 3200x1800: the PNG this replaced was 1280x720, narrower than
+          this box renders at full zoom, so it was being upscaled. `sizes` is
+          explicit because the cutout is ~62vw zoomed and ~64vw at rest — the
+          `fill` default of 100vw over-fetched and warned on every request. */}
       <ProtectedImage
         src="/mockup/macos-bg.avif"
         alt="macOS Background"

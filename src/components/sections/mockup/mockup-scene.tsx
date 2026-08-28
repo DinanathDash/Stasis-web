@@ -29,16 +29,12 @@ const SCREEN_LIVE_AT = 0.98;
  * The pinned mockup scene: the MacBook grows and drifts left as you scroll,
  * clearing the right of the viewport for the `aside` slot.
  *
- * Pinning is CSS `position: sticky`; ScrollTrigger only supplies values. Using
- * its `pin: true` would inject a `div.pin-spacer` and reparent nodes behind
- * React's back (a reliable source of `removeChild` errors on Fast Refresh),
- * and would compute the scene's height after hydration instead of at first
- * paint.
+ * Pinning is CSS `position: sticky`; ScrollTrigger only supplies values. Its
+ * own `pin: true` would inject a `div.pin-spacer` behind React's back and
+ * compute the scene's height after hydration instead of at first paint.
  *
- * `device` is whatever sits on the stage — the scene does not care which
- * mockup it is animating. Anything rendered there is in design units and
- * scales with the scene; anything that should stay at reading size goes in
- * `aside`, which sits outside the transformed subtree.
+ * `device` is whatever sits on the stage and scales with the scene; anything
+ * that should stay at reading size goes in `aside`, outside the transform.
  */
 export function MockupScene({
   device,
@@ -71,9 +67,8 @@ export function MockupScene({
     () => {
       const mm = gsap.matchMedia();
 
-      // gsap.matchMedia (not the deprecated ScrollTrigger.matchMedia) reverts
-      // every GSAP-authored inline style when the query stops matching, so a
-      // desktop-to-mobile resize doesn't strand a stale transform on the stage.
+      // matchMedia reverts every GSAP-authored inline style when the query
+      // stops matching, so a resize to mobile strands no stale transform.
       mm.add(`${SCENE_MQ} and (prefers-reduced-motion: no-preference)`, () => {
         const scrollEl = scrollRef.current;
         const sceneEl = sceneRef.current;
@@ -85,11 +80,10 @@ export function MockupScene({
         const targets = () =>
           computeSceneTargets(baseScaleRef.current, window.innerWidth);
 
-        // Duration normalised to 1 so collaborators can place tweens at a
-        // literal fraction of the pin. See scene-context.tsx. Every tween
-        // below must therefore end at 1, not overrun it — a tween placed at
-        // 0.12 with duration 1 would stretch the timeline to 1.12 and
-        // silently rescale everyone else's placements.
+        // Normalised to 1 so collaborators can place tweens at a literal
+        // fraction of the pin (see scene-context.tsx). Every tween must end at
+        // exactly 1: one placed at 0.12 with duration 1 would stretch the
+        // timeline to 1.12 and silently rescale everyone else's placements.
         const tl = gsap.timeline({ defaults: { ease: "none", duration: 1 } });
 
         tl.fromTo(
@@ -106,9 +100,8 @@ export function MockupScene({
             ease: SCENE_EASE_DRIFT,
             force3D: true,
           },
-          // The drift enters as a second beat, after the growth has
-          // started. Baking it into transform-origin instead would make
-          // this retiming impossible.
+          // A second beat, after the growth has started. Baking it into
+          // transform-origin instead would make this retiming impossible.
           SCENE_DRIFT_OFFSET,
         );
 
@@ -137,30 +130,21 @@ export function MockupScene({
             scrollEl.classList.toggle(styles.active, self.isActive),
         });
 
-        // ------------------------------------------------------------------
         // The vertical settle, on the APPROACH — deliberately not on the
-        // timeline above.
+        // timeline above. The stage opens at production height and has to end
+        // up centred, which on a tall viewport is a couple of hundred pixels.
+        // Run inside the pin, that travel is the only vertical motion on
+        // screen and it points *down* while the reader scrolls down: the
+        // mockup rises with the page, reverses, then stops. That reversal is
+        // the bounce. Spent on the approach it hides inside motion already
+        // happening — the pin box travels a full viewport up while the stage
+        // drifts down within it, so the net never changes sign.
         //
-        // The stage opens at the mockup's production height and has to end up
-        // centred in the pin, and on a tall viewport that is a couple of
-        // hundred pixels of travel. Run inside the pin, that travel is the
-        // only vertical motion on screen, and it points *down* while the
-        // reader is scrolling down — the mockup rises with the page, reverses,
-        // then stops. That reversal is the bounce, and it is symmetric: the
-        // same flick shows up on the way back to the hero.
-        //
-        // Spending it on the approach instead hides it inside motion that is
-        // already happening. The pin box travels a full viewport upward over
-        // this range while the stage drifts a couple of hundred pixels down
-        // within it, so the net movement never changes sign — it just arrives
-        // slightly slower than the page, which reads as settling.
-        //
-        // `start: 0` (a raw number, so an absolute scroll position rather than
-        // an element edge) rather than "top bottom": the mockup is already on
-        // screen at the top of the page on a tall viewport, so an entry-based
-        // start would have a third of the settle already applied at rest and
-        // the opening composition would no longer match production. From 0,
-        // scroll position 0 is exactly production height by construction.
+        // `start: 0` is a raw number, so an absolute scroll position rather
+        // than an element edge. "top bottom" would have a third of the settle
+        // already applied at rest on a tall viewport, where the mockup is
+        // on screen at the top of the page; from 0, scroll 0 is production
+        // height by construction.
         ScrollTrigger.create({
           trigger: sceneEl,
           start: 0,

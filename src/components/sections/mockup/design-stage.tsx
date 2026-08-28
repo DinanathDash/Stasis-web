@@ -2,7 +2,6 @@
 
 import { useCallback, useLayoutEffect, useRef, type RefObject } from "react";
 import gsap from "gsap";
-import { cn } from "@/lib/utils";
 import {
   STAGE_W,
   STAGE_H,
@@ -15,25 +14,18 @@ import {
 } from "./stage-geometry";
 
 /**
- * Fits the fixed 1454x872 stage into the pinned viewport and keeps the live
- * scale published for anything that needs it.
+ * Fits the fixed 1454x872 stage into the pinned viewport and publishes the live
+ * scale.
  *
- * Two transform nodes, and the split is about *write ownership*, not
- * rendering (browsers collapse nested transforms into one matrix anyway):
+ * Two transform nodes, split by *write ownership* rather than rendering: GSAP
+ * owns `.stageScroll`'s transform, React owns `.stageBase`'s. GSAP keeps its
+ * own transform cache, so a second writer on the same node produces drift that
+ * only reproduces on resize.
  *
- *   .stageScroll  <- GSAP owns `transform`. Nothing else may write it.
- *   .stageBase    <- React owns `transform`. Rewritten on resize only.
- *
- * GSAP maintains its own transform cache on any element it tweens. If React
- * also wrote to that node when the base fit changed, the two would silently
- * fight and produce drift that only reproduces on window resize.
- *
- * Note there is no `transform-origin` anywhere. `.stageViewport` is a
- * zero-size box at the centre of the pin, so every default `50% 50%` origin
- * in the chain resolves to that same single point, and `.stageBase`'s
- * half-size offset centres it there. Scale and x therefore stay independent
- * degrees of freedom, which is what lets the drift be timed separately from
- * the growth.
+ * There is no `transform-origin` anywhere: `.stageViewport` is a zero-size box
+ * at the pin's centre, so every default `50% 50%` resolves to that one point.
+ * Scale and x therefore stay independent, which is what lets the drift be timed
+ * separately from the growth.
  */
 export function useStageFit({
   pinRef,
@@ -43,17 +35,11 @@ export function useStageFit({
   pinRef: RefObject<HTMLDivElement | null>;
   scrollRef: RefObject<HTMLDivElement | null>;
   /**
-   * Where the *live* custom properties are written, once per scrubbed frame.
-   *
-   * Deliberately not the pin. Setting a custom property on an element
-   * invalidates style for everything beneath it that could inherit the value,
-   * and the pin is the ancestor of the entire mockup — several hundred nodes,
-   * re-invalidated every frame, for properties no descendant reads. Point this
-   * at a small leaf container instead (the scene points it at the aside, the
-   * only thing that has ever wanted them).
-   *
-   * Anything *inside* the stage should read the scale from `useStageScale()`
-   * rather than asking for it here.
+   * Where the live custom properties are written, once per scrubbed frame.
+   * Deliberately not the pin: a custom property invalidates style for the whole
+   * subtree beneath it, and the pin is the ancestor of the entire mockup. Point
+   * this at a small leaf (the scene uses the aside). Anything inside the stage
+   * should read `useStageScale()` instead.
    */
   varsRef?: RefObject<HTMLElement | null>;
 }) {
@@ -66,27 +52,22 @@ export function useStageFit({
   /** GSAP transform-cache getter, bound once per scroll node. See `sync`. */
   const getPropRef = useRef<ReturnType<typeof gsap.getProperty> | null>(null);
   const getPropTargetRef = useRef<HTMLElement | null>(null);
-  /** Offset from the pin's centre that puts the mockup at its production
-   *  height. The scene eases this away on the approach, so the mockup is
-   *  already centred by the time the pin engages. 0 when degraded. */
+  /** Offset from the pin's centre that puts the mockup at production height.
+   *  The scene eases it away on the approach. 0 when degraded. */
   const restOffsetRef = useRef(0);
 
   /**
-   * Publishes total scale (base x scroll) to both consumers from one place,
-   * so the CSS custom property and the JS ref can never disagree.
-   *
-   * Runs on every scrubbed frame, so it must not touch layout. Everything here
-   * is either a GSAP transform-cache read or a style write; the pin's width
-   * comes from `measure`'s cache rather than `clientWidth`, which would force
-   * a reflow each frame by reading right after GSAP's transform write.
+   * Publishes total scale (base x scroll) from one place, so the CSS property
+   * and the JS ref can never disagree. Runs every scrubbed frame, so it must
+   * not touch layout — the pin's width comes from `measure`'s cache, since
+   * reading `clientWidth` right after GSAP's transform write would force a
+   * reflow each frame.
    */
   const sync = useCallback(() => {
     const scrollEl = scrollRef.current;
 
-    // gsap.getProperty(el) builds and returns a getter bound to that element's
-    // transform cache. Calling the two-argument form rebuilds it on every
-    // access; hold the bound getter instead and rebuild only if the node is
-    // swapped out (Fast Refresh).
+    // The two-argument gsap.getProperty rebuilds its bound getter on every
+    // access; hold it instead, rebuilding only if the node is swapped out.
     if (scrollEl && getPropTargetRef.current !== scrollEl) {
       getPropTargetRef.current = scrollEl;
       getPropRef.current = gsap.getProperty(scrollEl);
@@ -103,7 +84,7 @@ export function useStageFit({
     vars.style.setProperty("--stage-scale", String(total));
 
     // Live viewport x of the stage's right edge, so the aside can hug the
-    // mockup in pure CSS: `left: calc(var(--stage-right) + 3rem)`.
+    // mockup in CSS: `left: calc(var(--stage-right) + 3rem)`.
     const x = getProp ? Number(getProp("x")) || 0 : 0;
     const right = pinWidthRef.current / 2 + x + (STAGE_W * total) / 2;
     vars.style.setProperty("--stage-right", `${right}px`);
@@ -129,18 +110,13 @@ export function useStageFit({
     base.style.transform = `scale(${s}) translateY(${STAGE_OPTICAL_DY}px)`;
     pin.style.setProperty("--stage-base-scale", String(s));
 
-    // Open at the height the mockup has in production rather than centred.
-    // The scene eases this away on the *approach*, before the pin engages —
-    // see the settle trigger in mockup-scene.tsx.
+    // Open at production height rather than centred; the scene eases this away
+    // on the approach. Read the computed position rather than re-testing the
+    // media query, so this cannot disagree with the CSS about being degraded.
     //
-    // Read the computed position rather than re-testing the media query, so
-    // this can never disagree with the CSS about whether we are degraded.
-    //
-    // The optical nudge has to come back out here. `.stageBase` renders as
-    // `scale(s) translateY(DY)`, so its top edge lands at (DY - STAGE_H/2) * s
-    // from the stage's centre, not at -STAGE_H/2 * s. Positioning off the
-    // box centre alone leaves the frame DY*s too low — ~31px at the default
-    // fit, which is exactly the gap against production.
+    // The optical nudge has to come back out here: `.stageBase` renders as
+    // `scale(s) translateY(DY)`, so its top edge lands DY*s below where the box
+    // centre alone would put it — ~31px at the default fit.
     const pinned = getComputedStyle(pin).position === "sticky";
     restOffsetRef.current = pinned
       ? SCENE_REST_TOP + (STAGE_H / 2 - STAGE_OPTICAL_DY) * s - height / 2
@@ -207,55 +183,6 @@ export function StageNodes({
           {children}
         </div>
       </div>
-    </div>
-  );
-}
-
-/**
- * An object on the stage, positioned in design units.
- *
- * Every element of the mockup — the screen, the menu bar, the dock, and later
- * the Stasis settings window and popover — is one of these. Adding a new
- * object means adding a `<StageLayer>` with integer DU coordinates; it
- * inherits the stage's transform for free and needs no responsive rules.
- */
-export function StageLayer({
-  x,
-  y,
-  w,
-  h,
-  z = 0,
-  clip = false,
-  radius,
-  className,
-  style,
-  children,
-}: {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  z?: number;
-  clip?: boolean;
-  radius?: number;
-  className?: string;
-  style?: React.CSSProperties;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div
-      className={cn("absolute", clip && "overflow-hidden", className)}
-      style={{
-        left: x,
-        top: y,
-        width: w,
-        height: h,
-        zIndex: z,
-        borderRadius: radius,
-        ...style,
-      }}
-    >
-      {children}
     </div>
   );
 }

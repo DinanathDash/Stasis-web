@@ -55,53 +55,39 @@ export const SPRING_GLIDE = {
 // ---------------------------------------------------------------------------
 // GSAP / Lenis scroll tokens.
 //
-// Everything above feeds framer-motion and uses cubic-bezier arrays. GSAP
-// does not consume that form — passing it an array silently falls back to
-// power1.out. The eases below are GSAP ease *strings*; keep the two families
-// apart.
+// Everything above feeds framer-motion and uses cubic-bezier arrays. GSAP does
+// not consume that form — passing it an array silently falls back to
+// power1.out. The eases below are GSAP ease *strings*; keep the two apart.
 // ---------------------------------------------------------------------------
 
-/**
- * ScrollTrigger scrub, deliberately low.
- *
- * Lenis already smooths the scroll *position*; scrub smooths the animation's
- * *pursuit* of that position. Stacking both aggressively compounds latency
- * and reads as mush rather than silk. 0.4–0.6 is where they complement.
- */
+/** Lenis already smooths the scroll *position*; scrub smooths the animation's
+ *  *pursuit* of it. Stacking both aggressively reads as mush, not silk. */
 export const SCRUB_SCENE = 0.5;
 
 /** Growth of the pinned mockup through the scene. */
 export const SCENE_EASE_GROW = "power2.inOut";
+
 /**
  * Leftward drift, entering as a second beat after the growth starts.
  *
- * `inOut`, not `out`. Because the drift is placed at SCENE_DRIFT_OFFSET rather
- * than 0, its ease's *initial* velocity is a real discontinuity in the middle
- * of the scene: `power3.out` leaves the gate at 3x linear speed, so the mockup
- * visibly kicks sideways at 12%. An `inOut` starts and ends at zero velocity,
- * so the drift grows out of the stillness before it and settles back into
- * stillness after it.
+ * `inOut`, not `out`. Placed at an offset rather than 0, the ease's *initial*
+ * velocity is a discontinuity mid-scene: `power3.out` leaves the gate at 3x
+ * linear speed, so the mockup visibly kicks sideways. `inOut` starts and ends
+ * at zero velocity.
  */
 export const SCENE_EASE_DRIFT = "power2.inOut";
 /** Where the drift joins the timeline, as a fraction of the pin. */
 export const SCENE_DRIFT_OFFSET = 0.12;
 
-/**
- * The mockup opens at the height it has in production and eases to centred.
- *
- * This runs on the *approach* to the scene, not inside the pin — see the
- * settle trigger in mockup-scene.tsx. Easing `out` puts most of the travel
- * early, while the page is still moving fast underneath it, and arrives at
- * zero velocity exactly as the pin takes over.
- */
+/** The mockup opens at production height and eases to centred on the
+ *  *approach*, not inside the pin — see the settle trigger in mockup-scene.tsx.
+ *  Easing `out` puts most of the travel early, while the page is still moving
+ *  fast underneath it, and arrives at zero velocity as the pin takes over. */
 export const SCENE_EASE_SETTLE = "power2.out";
 
-/**
- * The "psst… it's interactive" note swaps position by cross-fade rather than
- * travelling. The gap between `out` ending and `in` starting is deliberate —
- * a beat with no note at all, so the second one reads as a new remark rather
- * than the first one having moved.
- */
+/** The note swaps position by cross-fade rather than travelling. The gap
+ *  between `out` ending and `in` starting is deliberate — a beat with no note
+ *  at all, so the second reads as a new remark rather than the first moving. */
 export const SCENE_NOTE_SWAP = {
   outAt: 0.12,
   outDuration: 0.14,

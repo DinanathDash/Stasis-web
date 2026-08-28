@@ -21,16 +21,13 @@ const ITEMS = [
 ];
 
 /**
- * Copy occupying the space the mockup clears as it drifts left.
+ * Copy occupying the space the mockup clears as it drifts left. Placeholder
+ * content: swap the strings, keep the wiring.
  *
- * Placeholder content: swap the strings, keep the wiring. It lives outside the
- * stage's transform on purpose — the stage is for the object, the aside is for
- * the page — so this text stays at real reading sizes with normal responsive
- * rules while the mockup scales beside it.
- *
- * It also keeps something visibly moving through the whole pin, which matters
- * because scrollbars are hidden globally: a long pin with nothing changing in
- * it reads as a stuck page.
+ * Outside the stage's transform on purpose, so it stays at reading size while
+ * the mockup scales beside it. It also keeps something visibly moving through
+ * the whole pin, which matters because scrollbars are hidden globally — a long
+ * pin with nothing changing in it reads as a stuck page.
  */
 export function SceneAside() {
   const ref = useRef<HTMLDivElement>(null);
@@ -47,8 +44,7 @@ export function SceneAside() {
       );
       if (!items.length) return;
 
-      // Placed at 34% of the pin and ending at 68%, so the timeline's total
-      // duration stays 1 and the ScrollTrigger mapping is unaffected.
+      // 34% to 68% of the pin, so the timeline's total duration stays 1.
       timeline.fromTo(
         items,
         { autoAlpha: 0, y: 28 },

@@ -12,14 +12,11 @@ import { LENIS_OPTIONS } from "@/lib/ease";
  * Site-wide smooth scroll, driven off GSAP's ticker so Lenis and ScrollTrigger
  * share one clock.
  *
- * Returns a bare fragment on purpose. Beyond tidiness, rendering no DOM node
- * guarantees this can never become a `transform` / `filter` / `contain`
- * ancestor of the tree it wraps — any of which would create a containing block
- * for `position: fixed` and break ScrollProgress and the sticky header.
- *
- * Note also that `children` arrives as a prop, so the server-rendered tree
- * passes straight through this client boundary. The async Hero server
- * component below it stays on the server.
+ * Returns a bare fragment on purpose: rendering no DOM node guarantees this can
+ * never become a `transform` / `filter` / `contain` ancestor of what it wraps,
+ * any of which would create a containing block for `position: fixed` and break
+ * ScrollProgress and the sticky header. `children` arrives as a prop, so the
+ * server-rendered tree passes straight through this client boundary.
  */
 export function SmoothScrollProvider({
   children,
@@ -36,19 +33,19 @@ export function SmoothScrollProvider({
     const start = () => {
       if (lenis || reduceMotion.matches) return;
 
-      // autoRaf must be off explicitly — its own internal loop running
-      // alongside gsap.ticker would advance Lenis twice per frame.
+      // autoRaf off explicitly: its own loop alongside gsap.ticker would
+      // advance Lenis twice per frame.
       lenis = new Lenis({ ...LENIS_OPTIONS, autoRaf: false });
       setLenis(lenis);
       lenis.on("scroll", ScrollTrigger.update);
 
-      // gsap.ticker reports seconds; lenis.raf expects milliseconds. Getting
-      // this wrong is the classic failure and presents as frozen scrolling.
+      // gsap.ticker reports seconds; lenis.raf wants milliseconds. Getting
+      // this wrong presents as frozen scrolling.
       tick = (time: number) => lenis?.raf(time * 1000);
       gsap.ticker.add(tick);
 
-      // Without this, GSAP clamps large frame deltas after a tab switch or a
-      // long task and desyncs from Lenis.
+      // Without this GSAP clamps large frame deltas after a tab switch and
+      // desyncs from Lenis.
       gsap.ticker.lagSmoothing(0);
 
       ScrollTrigger.refresh();
@@ -71,8 +68,7 @@ export function SmoothScrollProvider({
     reduceMotion.addEventListener("change", onPreferenceChange);
 
     // Cleanup has to be exact: StrictMode mounts this twice in dev, and a
-    // leaked instance shows up as scrolling running at double speed in dev
-    // but behaving correctly in a production build.
+    // leaked instance shows up as double-speed scrolling in dev only.
     return () => {
       reduceMotion.removeEventListener("change", onPreferenceChange);
       stop();
