@@ -125,14 +125,14 @@ export function BatteryPopover({ isOpen, onClose }: BatteryPopoverProps) {
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 relative flex items-center justify-center">
                         <ProtectedImage
-                          src="/icons/Stasis.svg"
-                          alt="Stasis"
+                          src="/icons/Safari.svg"
+                          alt="Safari"
                           fill
                           className="object-contain"
                           priority
                         />
                       </div>
-                      <span>Stasis</span>
+                      <span>Safari</span>
                     </div>
                     <span className="text-orange-500 font-medium tabular-nums">
                       14.4
@@ -142,14 +142,14 @@ export function BatteryPopover({ isOpen, onClose }: BatteryPopoverProps) {
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 relative flex items-center justify-center">
                         <ProtectedImage
-                          src="/icons/Safari.svg"
-                          alt="Safari"
+                          src="/icons/Photos.svg"
+                          alt="Photos"
                           fill
                           className="object-contain"
                           priority
                         />
                       </div>
-                      <span>Safari</span>
+                      <span>Photos</span>
                     </div>
                     <span className="text-blue-500 font-medium tabular-nums">
                       4.4

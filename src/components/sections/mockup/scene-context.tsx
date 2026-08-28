@@ -35,7 +35,9 @@ export function SceneProvider({
   value: SceneApi;
   children: React.ReactNode;
 }) {
-  return <SceneContext.Provider value={value}>{children}</SceneContext.Provider>;
+  return (
+    <SceneContext.Provider value={value}>{children}</SceneContext.Provider>
+  );
 }
 
 export function useScene(): SceneApi | null {

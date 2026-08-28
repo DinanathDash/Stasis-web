@@ -65,8 +65,7 @@ export function SmoothScrollProvider({
       setLenis(null);
     };
 
-    const onPreferenceChange = () =>
-      reduceMotion.matches ? stop() : start();
+    const onPreferenceChange = () => (reduceMotion.matches ? stop() : start());
 
     start();
     reduceMotion.addEventListener("change", onPreferenceChange);

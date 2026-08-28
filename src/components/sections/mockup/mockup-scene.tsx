@@ -73,89 +73,86 @@ export function MockupScene({
       // gsap.matchMedia (not the deprecated ScrollTrigger.matchMedia) reverts
       // every GSAP-authored inline style when the query stops matching, so a
       // desktop-to-mobile resize doesn't strand a stale transform on the stage.
-      mm.add(
-        `${SCENE_MQ} and (prefers-reduced-motion: no-preference)`,
-        () => {
-          const scrollEl = scrollRef.current;
-          const sceneEl = sceneRef.current;
-          const pinEl = pinRef.current;
-          if (!scrollEl || !sceneEl || !pinEl) return;
+      mm.add(`${SCENE_MQ} and (prefers-reduced-motion: no-preference)`, () => {
+        const scrollEl = scrollRef.current;
+        const sceneEl = sceneRef.current;
+        const pinEl = pinRef.current;
+        if (!scrollEl || !sceneEl || !pinEl) return;
 
-          // Function-based values, re-evaluated on every refresh because both
-          // targets depend on viewport width and the measured base scale.
-          const targets = () =>
-            computeSceneTargets(baseScaleRef.current, window.innerWidth);
+        // Function-based values, re-evaluated on every refresh because both
+        // targets depend on viewport width and the measured base scale.
+        const targets = () =>
+          computeSceneTargets(baseScaleRef.current, window.innerWidth);
 
-          // Duration normalised to 1 so collaborators can place tweens at a
-          // literal fraction of the pin. See scene-context.tsx. Every tween
-          // below must therefore end at 1, not overrun it — a tween placed at
-          // 0.12 with duration 1 would stretch the timeline to 1.12 and
-          // silently rescale everyone else's placements.
-          const tl = gsap.timeline({ defaults: { ease: "none", duration: 1 } });
+        // Duration normalised to 1 so collaborators can place tweens at a
+        // literal fraction of the pin. See scene-context.tsx. Every tween
+        // below must therefore end at 1, not overrun it — a tween placed at
+        // 0.12 with duration 1 would stretch the timeline to 1.12 and
+        // silently rescale everyone else's placements.
+        const tl = gsap.timeline({ defaults: { ease: "none", duration: 1 } });
 
-          tl.fromTo(
+        tl.fromTo(
+          scrollEl,
+          { scale: 1 },
+          { scale: () => targets().k, ease: SCENE_EASE_GROW, force3D: true },
+          0,
+        )
+          .fromTo(
             scrollEl,
-            { scale: 1 },
-            { scale: () => targets().k, ease: SCENE_EASE_GROW, force3D: true },
-            0,
-          )
-            .fromTo(
-              scrollEl,
-              { x: 0 },
-              {
-                x: () => targets().x,
-                duration: 1 - SCENE_DRIFT_OFFSET,
-                ease: SCENE_EASE_DRIFT,
-                force3D: true,
-              },
-              // The drift enters as a second beat, after the growth has
-              // started. Baking it into transform-origin instead would make
-              // this retiming impossible.
-              SCENE_DRIFT_OFFSET,
-            )
-            .fromTo(
-              scrollEl,
-              { y: 0 },
-              {
-                // The stage rests at production height via the viewport's
-                // margin; this cancels that offset and lands it centred,
-                // biased down to clear the header.
-                y: () => SCENE_CENTER_BIAS - restOffsetRef.current,
-                duration: SCENE_SETTLE_DURATION,
-                ease: SCENE_EASE_SETTLE,
-                force3D: true,
-              },
-              0,
-            );
-
-          ScrollTrigger.create({
-            trigger: sceneEl,
-            start: "top top",
-            // The point where the sticky box stops sticking — definitionally
-            // the end of the pin, so it stays correct if --scene-scroll is
-            // retuned in CSS without touching this file.
-            end: "bottom bottom",
-            scrub: SCRUB_SCENE,
-            invalidateOnRefresh: true,
-            animation: tl,
-            onUpdate: (self) => {
-              progressRef.current = self.progress;
-              sync();
-
-              const live = self.progress >= SCREEN_LIVE_AT;
-              if (live !== liveRef.current) {
-                liveRef.current = live;
-                pinEl.dataset.screenLive = String(live);
-              }
+            { x: 0 },
+            {
+              x: () => targets().x,
+              duration: 1 - SCENE_DRIFT_OFFSET,
+              ease: SCENE_EASE_DRIFT,
+              force3D: true,
             },
-            onToggle: (self) =>
-              scrollEl.classList.toggle(styles.active, self.isActive),
-          });
+            // The drift enters as a second beat, after the growth has
+            // started. Baking it into transform-origin instead would make
+            // this retiming impossible.
+            SCENE_DRIFT_OFFSET,
+          )
+          .fromTo(
+            scrollEl,
+            { y: 0 },
+            {
+              // The stage rests at production height via the viewport's
+              // margin; this cancels that offset and lands it centred,
+              // biased down to clear the header.
+              y: () => SCENE_CENTER_BIAS - restOffsetRef.current,
+              duration: SCENE_SETTLE_DURATION,
+              ease: SCENE_EASE_SETTLE,
+              force3D: true,
+            },
+            0,
+          );
 
-          setTimeline(tl);
-          return () => setTimeline(null);
-        },
-      );
+        ScrollTrigger.create({
+          trigger: sceneEl,
+          start: "top top",
+          // The point where the sticky box stops sticking — definitionally
+          // the end of the pin, so it stays correct if --scene-scroll is
+          // retuned in CSS without touching this file.
+          end: "bottom bottom",
+          scrub: SCRUB_SCENE,
+          invalidateOnRefresh: true,
+          animation: tl,
+          onUpdate: (self) => {
+            progressRef.current = self.progress;
+            sync();
+
+            const live = self.progress >= SCREEN_LIVE_AT;
+            if (live !== liveRef.current) {
+              liveRef.current = live;
+              pinEl.dataset.screenLive = String(live);
+            }
+          },
+          onToggle: (self) =>
+            scrollEl.classList.toggle(styles.active, self.isActive),
+        });
+
+        setTimeline(tl);
+        return () => setTimeline(null);
+      });
 
       // GeistSans swaps metrics after load, which moves the hero's height and
       // therefore where `start: "top top"` lands.

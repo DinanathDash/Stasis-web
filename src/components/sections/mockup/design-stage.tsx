@@ -112,10 +112,7 @@ export function useStageFit({
     restOffsetRef.current = pinned
       ? SCENE_REST_TOP + (STAGE_H / 2 - STAGE_OPTICAL_DY) * s - height / 2
       : 0;
-    pin.style.setProperty(
-      "--stage-rest-offset",
-      `${restOffsetRef.current}px`,
-    );
+    pin.style.setProperty("--stage-rest-offset", `${restOffsetRef.current}px`);
 
     sync();
   }, [pinRef, sync]);
