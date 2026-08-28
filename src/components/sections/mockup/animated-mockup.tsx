@@ -22,10 +22,13 @@ import { HandwrittenNote } from "@/components/ui/handwritten-note";
  * but no longer locks.
  */
 export function AnimatedMockupBody({
-  revealBattery,
+  batteryOpen,
+  onBatteryOpenChange,
 }: {
-  /** Forwarded to MainScreen — see its prop docs. */
-  revealBattery?: boolean;
+  /** Forwarded to MainScreen — see its prop docs. Pass both or neither:
+   *  supplying `batteryOpen` puts the popover under the caller's control. */
+  batteryOpen?: boolean;
+  onBatteryOpenChange?: (open: boolean) => void;
 } = {}) {
   return (
     <div className="w-full relative group">
@@ -71,7 +74,10 @@ export function AnimatedMockupBody({
           zIndex: 0,
         }}
       >
-        <MainScreen revealBattery={revealBattery} />
+        <MainScreen
+          batteryOpen={batteryOpen}
+          onBatteryOpenChange={onBatteryOpenChange}
+        />
       </div>
     </div>
   );

@@ -72,18 +72,29 @@ export const SCRUB_SCENE = 0.5;
 
 /** Growth of the pinned mockup through the scene. */
 export const SCENE_EASE_GROW = "power2.inOut";
-/** Leftward drift, entering as a second beat after the growth starts. */
-export const SCENE_EASE_DRIFT = "power3.out";
+/**
+ * Leftward drift, entering as a second beat after the growth starts.
+ *
+ * `inOut`, not `out`. Because the drift is placed at SCENE_DRIFT_OFFSET rather
+ * than 0, its ease's *initial* velocity is a real discontinuity in the middle
+ * of the scene: `power3.out` leaves the gate at 3x linear speed, so the mockup
+ * visibly kicks sideways at 12%. An `inOut` starts and ends at zero velocity,
+ * so the drift grows out of the stillness before it and settles back into
+ * stillness after it.
+ */
+export const SCENE_EASE_DRIFT = "power2.inOut";
 /** Where the drift joins the timeline, as a fraction of the pin. */
 export const SCENE_DRIFT_OFFSET = 0.12;
 
 /**
- * The mockup opens at its production height and eases to centred over the
- * first fifth of the pin, before the growth has gone far enough for the shift
- * to read as movement in its own right.
+ * The mockup opens at the height it has in production and eases to centred.
+ *
+ * This runs on the *approach* to the scene, not inside the pin — see the
+ * settle trigger in mockup-scene.tsx. Easing `out` puts most of the travel
+ * early, while the page is still moving fast underneath it, and arrives at
+ * zero velocity exactly as the pin takes over.
  */
 export const SCENE_EASE_SETTLE = "power2.out";
-export const SCENE_SETTLE_DURATION = 0.2;
 
 /**
  * The "psst… it's interactive" note swaps position by cross-fade rather than

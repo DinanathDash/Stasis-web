@@ -38,9 +38,24 @@ import {
 export function useStageFit({
   pinRef,
   scrollRef,
+  varsRef,
 }: {
   pinRef: RefObject<HTMLDivElement | null>;
   scrollRef: RefObject<HTMLDivElement | null>;
+  /**
+   * Where the *live* custom properties are written, once per scrubbed frame.
+   *
+   * Deliberately not the pin. Setting a custom property on an element
+   * invalidates style for everything beneath it that could inherit the value,
+   * and the pin is the ancestor of the entire mockup — several hundred nodes,
+   * re-invalidated every frame, for properties no descendant reads. Point this
+   * at a small leaf container instead (the scene points it at the aside, the
+   * only thing that has ever wanted them).
+   *
+   * Anything *inside* the stage should read the scale from `useStageScale()`
+   * rather than asking for it here.
+   */
+  varsRef?: RefObject<HTMLElement | null>;
 }) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const baseRef = useRef<HTMLDivElement | null>(null);
@@ -48,8 +63,12 @@ export function useStageFit({
   const totalScaleRef = useRef(1);
   /** Cached in `measure` so `sync` never reads layout. See below. */
   const pinWidthRef = useRef(0);
+  /** GSAP transform-cache getter, bound once per scroll node. See `sync`. */
+  const getPropRef = useRef<ReturnType<typeof gsap.getProperty> | null>(null);
+  const getPropTargetRef = useRef<HTMLElement | null>(null);
   /** Offset from the pin's centre that puts the mockup at its production
-   *  height. The scene tweens this away as it pins. 0 when degraded. */
+   *  height. The scene eases this away on the approach, so the mockup is
+   *  already centred by the time the pin engages. 0 when degraded. */
   const restOffsetRef = useRef(0);
 
   /**
@@ -62,22 +81,33 @@ export function useStageFit({
    * a reflow each frame by reading right after GSAP's transform write.
    */
   const sync = useCallback(() => {
-    const pin = pinRef.current;
     const scrollEl = scrollRef.current;
-    if (!pin) return;
 
-    const k = scrollEl ? Number(gsap.getProperty(scrollEl, "scaleX")) || 1 : 1;
+    // gsap.getProperty(el) builds and returns a getter bound to that element's
+    // transform cache. Calling the two-argument form rebuilds it on every
+    // access; hold the bound getter instead and rebuild only if the node is
+    // swapped out (Fast Refresh).
+    if (scrollEl && getPropTargetRef.current !== scrollEl) {
+      getPropTargetRef.current = scrollEl;
+      getPropRef.current = gsap.getProperty(scrollEl);
+    }
+    const getProp = scrollEl ? getPropRef.current : null;
+
+    const k = getProp ? Number(getProp("scaleX")) || 1 : 1;
     const total = baseScaleRef.current * k;
     totalScaleRef.current = total;
 
-    pin.style.setProperty("--stage-scale", String(total));
+    const vars = varsRef?.current;
+    if (!vars) return;
+
+    vars.style.setProperty("--stage-scale", String(total));
 
     // Live viewport x of the stage's right edge, so the aside can hug the
     // mockup in pure CSS: `left: calc(var(--stage-right) + 3rem)`.
-    const x = scrollEl ? Number(gsap.getProperty(scrollEl, "x")) || 0 : 0;
+    const x = getProp ? Number(getProp("x")) || 0 : 0;
     const right = pinWidthRef.current / 2 + x + (STAGE_W * total) / 2;
-    pin.style.setProperty("--stage-right", `${right}px`);
-  }, [pinRef, scrollRef]);
+    vars.style.setProperty("--stage-right", `${right}px`);
+  }, [scrollRef, varsRef]);
 
   const measure = useCallback(() => {
     const pin = pinRef.current;
@@ -100,6 +130,9 @@ export function useStageFit({
     pin.style.setProperty("--stage-base-scale", String(s));
 
     // Open at the height the mockup has in production rather than centred.
+    // The scene eases this away on the *approach*, before the pin engages —
+    // see the settle trigger in mockup-scene.tsx.
+    //
     // Read the computed position rather than re-testing the media query, so
     // this can never disagree with the CSS about whether we are degraded.
     //

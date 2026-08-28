@@ -131,9 +131,27 @@ export const LID_RIGHT = 1052;
 export const NOTE_ALT_LEFT = LID_RIGHT + 16;
 export const NOTE_ALT_TOP = 22;
 
-/** Where on the timeline the battery popover reveals itself, as a fraction of
- *  the pin — late enough that the mockup has settled and grown. */
+/**
+ * Where on the timeline the battery popover reveals itself, as a fraction of
+ * the pin — late enough that the mockup has settled and grown.
+ *
+ * Crossing it *downward* opens the popover. It is not a one-way latch: see
+ * SCENE_RESET_AT.
+ */
 export const SCENE_REVEAL_AT = 0.55;
+
+/**
+ * Where the popover closes again on the way back up, as a fraction of the pin.
+ *
+ * Just off zero rather than at it: a callback sitting exactly on 0 is on the
+ * timeline's own boundary, where GSAP's "did the playhead pass this?" test is
+ * ambiguous. A few percent in, the crossing is unambiguous in both directions
+ * and still reads as "when you get back to the hero".
+ *
+ * Crossing this upward also clears whatever the viewer did to the popover by
+ * hand, so the next scroll down demonstrates it again from a known state.
+ */
+export const SCENE_RESET_AT = 0.04;
 
 /**
  * Resolve the scroll-driven targets. `k` multiplies the base scale (so the

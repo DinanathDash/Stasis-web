@@ -13,25 +13,38 @@ import { chipLay1Sound } from "@/lib/chip-lay-1";
 interface MainScreenProps {
   onLock?: () => void;
   /**
-   * Flip to true to open the battery popover once, unprompted — used by the
-   * scroll scene to demonstrate what is interactive when the mockup reaches
-   * its viewing position. The user keeps full control afterwards; this only
-   * opens, it never forces it back shut.
+   * Whether the battery popover is open.
+   *
+   * Optional, and its presence is the switch between two modes. Left out, the
+   * screen owns the state itself and behaves like any standalone mockup. Given
+   * — as the scroll scene gives it — the screen is fully controlled and the
+   * owner decides, which is what lets the scene both open the popover as a
+   * demonstration and reset it when the reader returns to the hero.
+   *
+   * An earlier version had the screen keep a "the viewer has touched this"
+   * override that outranked the scene forever. It made the popover impossible
+   * to reopen: close it once and no amount of scrolling brought it back. One
+   * owner is the fix.
    */
-  revealBattery?: boolean;
+  batteryOpen?: boolean;
+  /** Fires for every open and close the screen itself initiates. */
+  onBatteryOpenChange?: (open: boolean) => void;
 }
 
-export function MainScreen({ onLock, revealBattery }: MainScreenProps) {
+export function MainScreen({
+  onLock,
+  batteryOpen,
+  onBatteryOpenChange,
+}: MainScreenProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [time, setTime] = useState("");
-  /**
-   * `null` until the viewer touches the popover themselves, so until then the
-   * scene's reveal drives it; after that their choice wins and the reveal can
-   * never reopen something they closed. Derived rather than synced in an
-   * effect, which would be a render-then-correct round trip.
-   */
-  const [userBatteryOpen, setUserBatteryOpen] = useState<boolean | null>(null);
-  const isBatteryOpen = userBatteryOpen ?? !!revealBattery;
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isBatteryOpen = batteryOpen ?? uncontrolledOpen;
+
+  const setBatteryOpen = (open: boolean) => {
+    if (batteryOpen === undefined) setUncontrolledOpen(open);
+    onBatteryOpenChange?.(open);
+  };
 
   useEffect(() => {
     const updateTime = () => {
@@ -63,10 +76,22 @@ export function MainScreen({ onLock, revealBattery }: MainScreenProps) {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
+      {/*
+        The AVIF, not the PNG beside it. Both are the same wallpaper, but the
+        PNG is 1280x720 — narrower than this box renders at full zoom on any
+        modern display, so it was being upscaled. The AVIF is 3200x1800 and
+        still a fifth of the file size.
+
+        `sizes` is explicit because this box is nowhere near the viewport's
+        width: the screen cutout is ~62vw at full zoom and ~64vw at rest.
+        Inheriting the `fill` default of 100vw made Next both fetch a source a
+        third too large and warn about it on every dev request.
+      */}
       <ProtectedImage
-        src="/mockup/macos-bg.png"
+        src="/mockup/macos-bg.avif"
         alt="macOS Background"
         fill
+        sizes="(max-width: 767px) 100vw, 65vw"
         className="object-cover absolute inset-0 z-0 pointer-events-none"
       />
 
@@ -124,7 +149,7 @@ export function MainScreen({ onLock, revealBattery }: MainScreenProps) {
           <div
             id="battery-trigger"
             className="flex items-center gap-1.5 h-full cursor-pointer"
-            onClick={() => setUserBatteryOpen(!isBatteryOpen)}
+            onClick={() => setBatteryOpen(!isBatteryOpen)}
           >
             <span className="text-[10px] sm:text-xs font-medium tabular-nums flex items-center h-full pt-px">
               78%
@@ -166,7 +191,7 @@ export function MainScreen({ onLock, revealBattery }: MainScreenProps) {
         {/* Battery Popover */}
         <BatteryPopover
           isOpen={isBatteryOpen}
-          onClose={() => setUserBatteryOpen(false)}
+          onClose={() => setBatteryOpen(false)}
         />
       </div>
 

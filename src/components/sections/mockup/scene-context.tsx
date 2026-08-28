@@ -24,6 +24,20 @@ export type SceneApi = {
   progress: RefObject<number>;
   /** Live total scale of the stage. Read at call time. */
   scale: RefObject<number>;
+  /**
+   * Which way the last scroll went: 1 down, -1 up.
+   *
+   * The companion to `timeline`. A `.call()` on the timeline fires whenever
+   * the playhead crosses it, in either direction — which is what you want for
+   * a cue that has to arm and disarm, but leaves the callback unable to tell
+   * the two crossings apart on its own. Read this inside it.
+   *
+   * Written from the trigger's own `onUpdate`, which runs on the scroll event
+   * itself, ahead of the scrub tween that eventually renders the timeline —
+   * so by the time a callback fires, this already reflects the scroll that
+   * caused it.
+   */
+  direction: RefObject<number>;
 };
 
 const SceneContext = createContext<SceneApi | null>(null);

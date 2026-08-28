@@ -8,7 +8,7 @@ export function AssetPreloader() {
     const imagesToPreload = [
       // Mockup and screens
       "/mockup/mockup.png",
-      "/mockup/macos-bg.png",
+      "/mockup/macos-bg.avif",
       "/mockup/static-screen.png",
       "/mockup/apple-lock.svg",
       "/mockup/battery.svg",

@@ -14,6 +14,7 @@ import {
   NOTE_ALT_LEFT,
   NOTE_ALT_TOP,
   SCENE_REVEAL_AT,
+  SCENE_RESET_AT,
 } from "./stage-geometry";
 
 /**
@@ -39,7 +40,13 @@ export function StagedAnimatedMockup() {
   const scene = useScene();
   const timeline = scene?.timeline ?? null;
 
-  const [revealBattery, setRevealBattery] = useState(false);
+  /**
+   * The scene owns the popover, so it can both demonstrate it and take it back.
+   * MainScreen renders it and reports the reader's own clicks up here, which
+   * means a click and a scroll cue write to the same piece of state instead of
+   * competing for it.
+   */
+  const [batteryOpen, setBatteryOpen] = useState(false);
 
   /**
    * Republish the scale with the legacy factor folded in.
@@ -99,10 +106,41 @@ export function StagedAnimatedMockup() {
       }
 
       // Open the popover unprompted once the mockup is settled and large, so
-      // it is obvious what the second note is pointing at. A timeline callback
-      // rather than a progress threshold read per frame, so it fires exactly
-      // once per crossing and costs nothing in between.
-      timeline.call(() => setRevealBattery(true), undefined, SCENE_REVEAL_AT);
+      // it is obvious what the second note is pointing at, and take it back
+      // when the reader returns to the hero. Timeline callbacks rather than a
+      // progress threshold read per frame: they fire exactly once per crossing
+      // and cost nothing in between.
+      //
+      // A `.call()` fires in both directions, so each one checks which way the
+      // scroll went. The pair is deliberately asymmetric — opening at 55% and
+      // closing back at the top, rather than closing at 55% too — so that the
+      // popover stays put through everything in between, including a reader
+      // scrolling back and forth to look at it.
+      //
+      // Closing here also resets a popover the reader shut by hand, which is
+      // what makes the cue repeatable: the next trip down demonstrates it
+      // again from a known state.
+      const direction = scene?.direction;
+      timeline.call(
+        () => {
+          if ((direction?.current ?? 1) > 0) setBatteryOpen(true);
+        },
+        undefined,
+        SCENE_REVEAL_AT,
+      );
+      timeline.call(
+        () => {
+          if ((direction?.current ?? 1) < 0) setBatteryOpen(false);
+        },
+        undefined,
+        SCENE_RESET_AT,
+      );
+
+      // Callbacks only fire on a crossing, and ScrollTrigger suppresses them
+      // while it renders the timeline to the current scroll position on setup.
+      // Land on the state that position implies, so a reload deep in the scene
+      // doesn't sit with the popover shut until you scroll back past 55%.
+      setBatteryOpen((scene?.progress.current ?? 0) >= SCENE_REVEAL_AT);
     },
     { dependencies: [timeline], scope: rootRef },
   );
@@ -118,7 +156,10 @@ export function StagedAnimatedMockup() {
       }}
     >
       <StageScaleProvider scaleRef={composedScale}>
-        <AnimatedMockupBody revealBattery={revealBattery} />
+        <AnimatedMockupBody
+          batteryOpen={batteryOpen}
+          onBatteryOpenChange={setBatteryOpen}
+        />
       </StageScaleProvider>
 
       {/*

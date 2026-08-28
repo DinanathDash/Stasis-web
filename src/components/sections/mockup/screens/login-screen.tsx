@@ -49,9 +49,10 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
     >
       {/* Background Image */}
       <ProtectedImage
-        src="/mockup/macos-bg.png"
+        src="/mockup/macos-bg.avif"
         alt="macOS Background"
         fill
+        sizes="(max-width: 767px) 100vw, 65vw"
         className="object-cover absolute inset-0 z-0"
       />
 

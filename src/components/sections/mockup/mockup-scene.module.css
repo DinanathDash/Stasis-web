@@ -36,6 +36,26 @@
    */
   overflow: hidden;
   overflow: clip;
+
+  /*
+   * Let ink — not layout — escape the clip edge.
+   *
+   * The frame carries `drop-shadow(0 20px 50px)`, which reaches ~95 legacy px
+   * below the machine and scales with the scene. Clipping at the pin's own box
+   * slices that gradient off mid-falloff, which is invisible during the pin
+   * (the edge coincides with the bottom of the viewport) but becomes a hard
+   * horizontal line across the page as the sticky box releases and scrolls up
+   * past the next section.
+   *
+   * `overflow-clip-margin` only moves the *paint* boundary. It cannot produce
+   * a scrollbar: `clip` is not a scroll container, and the escaping ink is off
+   * the left edge, which never contributes to scrollable overflow in LTR.
+   *
+   * Tuned to clear the shadow without letting the machine itself spill onto
+   * the neighbouring sections on short viewports, where the composition is
+   * already close to the pin's bottom edge.
+   */
+  overflow-clip-margin: 8rem;
 }
 
 /*

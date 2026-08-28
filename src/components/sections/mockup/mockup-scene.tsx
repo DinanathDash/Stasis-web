@@ -9,7 +9,6 @@ import {
   SCENE_EASE_DRIFT,
   SCENE_DRIFT_OFFSET,
   SCENE_EASE_SETTLE,
-  SCENE_SETTLE_DURATION,
 } from "@/lib/ease";
 import styles from "./mockup-scene.module.css";
 import { StageNodes, useStageFit } from "./design-stage";
@@ -51,7 +50,9 @@ export function MockupScene({
   const sceneRef = useRef<HTMLElement | null>(null);
   const pinRef = useRef<HTMLDivElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const asideRef = useRef<HTMLDivElement | null>(null);
   const progressRef = useRef(0);
+  const directionRef = useRef(1);
   const liveRef = useRef(false);
 
   const [timeline, setTimeline] = useState<gsap.core.Timeline | null>(null);
@@ -64,7 +65,7 @@ export function MockupScene({
     restOffsetRef,
     measure,
     sync,
-  } = useStageFit({ pinRef, scrollRef });
+  } = useStageFit({ pinRef, scrollRef, varsRef: asideRef });
 
   useGSAP(
     () => {
@@ -96,35 +97,20 @@ export function MockupScene({
           { scale: 1 },
           { scale: () => targets().k, ease: SCENE_EASE_GROW, force3D: true },
           0,
-        )
-          .fromTo(
-            scrollEl,
-            { x: 0 },
-            {
-              x: () => targets().x,
-              duration: 1 - SCENE_DRIFT_OFFSET,
-              ease: SCENE_EASE_DRIFT,
-              force3D: true,
-            },
-            // The drift enters as a second beat, after the growth has
-            // started. Baking it into transform-origin instead would make
-            // this retiming impossible.
-            SCENE_DRIFT_OFFSET,
-          )
-          .fromTo(
-            scrollEl,
-            { y: 0 },
-            {
-              // The stage rests at production height via the viewport's
-              // margin; this cancels that offset and lands it centred,
-              // biased down to clear the header.
-              y: () => SCENE_CENTER_BIAS - restOffsetRef.current,
-              duration: SCENE_SETTLE_DURATION,
-              ease: SCENE_EASE_SETTLE,
-              force3D: true,
-            },
-            0,
-          );
+        ).fromTo(
+          scrollEl,
+          { x: 0 },
+          {
+            x: () => targets().x,
+            duration: 1 - SCENE_DRIFT_OFFSET,
+            ease: SCENE_EASE_DRIFT,
+            force3D: true,
+          },
+          // The drift enters as a second beat, after the growth has
+          // started. Baking it into transform-origin instead would make
+          // this retiming impossible.
+          SCENE_DRIFT_OFFSET,
+        );
 
         ScrollTrigger.create({
           trigger: sceneEl,
@@ -138,6 +124,7 @@ export function MockupScene({
           animation: tl,
           onUpdate: (self) => {
             progressRef.current = self.progress;
+            directionRef.current = self.direction;
             sync();
 
             const live = self.progress >= SCREEN_LIVE_AT;
@@ -148,6 +135,49 @@ export function MockupScene({
           },
           onToggle: (self) =>
             scrollEl.classList.toggle(styles.active, self.isActive),
+        });
+
+        // ------------------------------------------------------------------
+        // The vertical settle, on the APPROACH — deliberately not on the
+        // timeline above.
+        //
+        // The stage opens at the mockup's production height and has to end up
+        // centred in the pin, and on a tall viewport that is a couple of
+        // hundred pixels of travel. Run inside the pin, that travel is the
+        // only vertical motion on screen, and it points *down* while the
+        // reader is scrolling down — the mockup rises with the page, reverses,
+        // then stops. That reversal is the bounce, and it is symmetric: the
+        // same flick shows up on the way back to the hero.
+        //
+        // Spending it on the approach instead hides it inside motion that is
+        // already happening. The pin box travels a full viewport upward over
+        // this range while the stage drifts a couple of hundred pixels down
+        // within it, so the net movement never changes sign — it just arrives
+        // slightly slower than the page, which reads as settling.
+        //
+        // `start: 0` (a raw number, so an absolute scroll position rather than
+        // an element edge) rather than "top bottom": the mockup is already on
+        // screen at the top of the page on a tall viewport, so an entry-based
+        // start would have a third of the settle already applied at rest and
+        // the opening composition would no longer match production. From 0,
+        // scroll position 0 is exactly production height by construction.
+        ScrollTrigger.create({
+          trigger: sceneEl,
+          start: 0,
+          end: "top top",
+          scrub: SCRUB_SCENE,
+          invalidateOnRefresh: true,
+          animation: gsap.fromTo(
+            scrollEl,
+            { y: 0 },
+            {
+              // Cancels the rest offset the viewport's margin applies, landing
+              // the stage centred and biased down to clear the header.
+              y: () => SCENE_CENTER_BIAS - restOffsetRef.current,
+              ease: SCENE_EASE_SETTLE,
+              force3D: true,
+            },
+          ),
         });
 
         setTimeline(tl);
@@ -172,7 +202,12 @@ export function MockupScene({
     <section ref={sceneRef} className={styles.scene}>
       <div ref={pinRef} className={styles.pin} data-screen-live="false">
         <SceneProvider
-          value={{ timeline, progress: progressRef, scale: totalScaleRef }}
+          value={{
+            timeline,
+            progress: progressRef,
+            scale: totalScaleRef,
+            direction: directionRef,
+          }}
         >
           <StageScaleProvider scaleRef={totalScaleRef}>
             <StageNodes
@@ -186,7 +221,11 @@ export function MockupScene({
             </StageNodes>
           </StageScaleProvider>
 
-          {aside ? <div className={styles.aside}>{aside}</div> : null}
+          {aside ? (
+            <div ref={asideRef} className={styles.aside}>
+              {aside}
+            </div>
+          ) : null}
         </SceneProvider>
       </div>
     </section>
