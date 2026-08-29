@@ -13,9 +13,9 @@ import { HandwrittenNote } from "@/components/ui/handwritten-note";
  * inside it.
  *
  * There is no boot sequence: this opens straight on `MainScreen`. The splash
- * and login screens were removed (see git history) along with the `ScreenState`
- * machine and `onLock`, so clicking the Apple menu plays its sound but does not
- * lock.
+ * and login screens, the `ScreenState` machine and the `onLock` callback were
+ * all removed (see git history), so the Apple menu is decoration now — the
+ * battery popover is the only thing on the screen that responds.
  */
 export function AnimatedMockupBody({
   batteryOpen,

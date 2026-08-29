@@ -15,7 +15,7 @@ import { useEffect } from "react";
  *     effect, long after the browser started fetching everything the first
  *     paint referenced, including the CSS backgrounds.
  *
- * What is left is what mounts *later*: the download dialog, and one hover state.
+ * What is left is what mounts *later*: the download dialog.
  */
 export function AssetPreloader() {
   useEffect(() => {
@@ -25,9 +25,6 @@ export function AssetPreloader() {
       "/dmg/dmg-background.webp",
       "/dmg/arrow-horizontal.svg",
       "/dmg/arrow-vertical.svg",
-
-      // Swapped in on hover over the mockup's Apple button.
-      "/mockup/apple-lock.svg",
     ];
 
     imagesToPreload.forEach((src) => {

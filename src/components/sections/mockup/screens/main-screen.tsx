@@ -1,17 +1,14 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { siApple } from "simple-icons";
 import { Zap } from "lucide-react";
 import { ProtectedImage } from "@/components/ui/protected-image";
 import { Dock, DockIcon } from "@/components/ui/dock";
 import { BatteryPopover } from "./battery-popover";
-import { playSound } from "@/lib/sound-engine";
-import { chipLay1Sound } from "@/lib/chip-lay-1";
 
 interface MainScreenProps {
-  onLock?: () => void;
   /**
    * Whether the battery popover is open. Its presence is the switch between
    * two modes: left out, the screen owns the state; given, the caller does.
@@ -25,11 +22,9 @@ interface MainScreenProps {
 }
 
 export function MainScreen({
-  onLock,
   batteryOpen,
   onBatteryOpenChange,
 }: MainScreenProps) {
-  const [isHovered, setIsHovered] = useState(false);
   const [time, setTime] = useState("");
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const isBatteryOpen = batteryOpen ?? uncontrolledOpen;
@@ -55,13 +50,6 @@ export function MainScreen({
     return () => clearInterval(interval);
   }, []);
 
-  const handleAppleClick = () => {
-    playSound(chipLay1Sound.dataUri);
-    if (onLock) {
-      onLock();
-    }
-  };
-
   return (
     <motion.div
       className="absolute inset-0 flex flex-col z-30 overflow-hidden bg-black/5"
@@ -84,52 +72,18 @@ export function MainScreen({
         className="object-cover absolute inset-0 z-0 pointer-events-none"
       />
 
-      {/* Top Left Menu Button */}
+      {/* Top left Apple menu. Chrome, not a control — a plain div rather than a
+          button, so nothing announces it as interactive or reacts to a hover it
+          has no response for. */}
       <div className="absolute top-3 left-3 z-40">
-        <button
-          onClick={handleAppleClick}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className="w-12 h-8 sm:w-14 sm:h-9 rounded-[8px] bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-[0_8px_32px_rgba(0,0,0,0.4)] relative"
-        >
-          <AnimatePresence mode="wait">
-            {isHovered ? (
-              <motion.div
-                key="lock"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.15 }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <div className="w-3.5 h-3.5 sm:w-6 sm:h-6 relative">
-                  <ProtectedImage
-                    src="/mockup/apple-lock.svg"
-                    alt="Apple lock"
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="apple"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.15 }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white"
-                >
-                  <path d={siApple.path} />
-                </svg>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </button>
+        <div className="w-12 h-8 sm:w-14 sm:h-9 rounded-[8px] bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+          <svg
+            viewBox="0 0 24 24"
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white"
+          >
+            <path d={siApple.path} />
+          </svg>
+        </div>
       </div>
 
       {/* Top Right Menu Bar */}
