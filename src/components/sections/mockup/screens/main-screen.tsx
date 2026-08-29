@@ -203,8 +203,13 @@ export function MainScreen({
             tooltip="Safari"
             className="bg-transparent !border-none !shadow-none"
           />
+          {/* WebP, not SVG. The SVG was a 36px icon wrapping a 1024x1024 and
+              a 2752x1536 base64 PNG — 8.1MB, and `next/image` passes SVGs
+              through untouched, so every visitor downloaded all of it for a
+              dock icon. Rasterised losslessly at 512, which covers the widest
+              magnified size the dock reaches. */}
           <DockIcon
-            icon="/icons/Stasis.svg"
+            icon="/icons/Stasis.webp"
             tooltip="Stasis"
             className="bg-transparent border-none shadow-none"
           />
