@@ -77,7 +77,10 @@ export function MainScreen({
         src="/mockup/macos-bg.avif"
         alt="macOS Background"
         fill
-        sizes="(max-width: 767px) 100vw, 65vw"
+        // 923px is what the screen cutout renders at on a phone, where the
+        // stage is pinned to a fixed 1:1 scale rather than fitted to the
+        // viewport, so it is a constant rather than a fraction of vw.
+        sizes="(max-width: 767px) 923px, 65vw"
         className="object-cover absolute inset-0 z-0 pointer-events-none"
       />
 

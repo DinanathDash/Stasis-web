@@ -28,10 +28,13 @@ export function AnimatedMockupBody({
 } = {}) {
   return (
     <div className="w-full relative group">
-      {/* `data-mockup-note` is the handle the scene fades this out by. */}
+      {/* `data-mockup-note` is the handle the scene fades this out by.
+          Shown on phones, where it is the only note and stays put, and from xl
+          up, where the scene cross-fades it to the second one. In between the
+          machine is panning through a narrow viewport with no room for it. */}
       <div
         data-mockup-note
-        className="absolute -top-26 right-4 md:-right-20 z-50 hidden md:block"
+        className="absolute -top-26 right-14 z-50 block md:hidden xl:block xl:-right-20"
       >
         <HandwrittenNote
           arrowPosition="left"
@@ -39,7 +42,7 @@ export function AnimatedMockupBody({
           arrowOffsetX={0}
           arrowOffsetY={20}
           arrowClassName="[transform:rotate(-60deg)_scaleX(-1)]"
-          className="text-white opacity-90 rotate-[-12deg]"
+          className="opacity-90 rotate-[-12deg]"
         >
           psst.... its interactive!
         </HandwrittenNote>

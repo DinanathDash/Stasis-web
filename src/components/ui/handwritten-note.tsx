@@ -22,7 +22,9 @@ export function HandwrittenNote({
   return (
     <div
       className={cn(
-        "font-caveat hidden rotate-[-4deg] items-center gap-3 text-2xl text-neutral-500 opacity-80 xl:flex dark:text-neutral-400 select-none",
+        // No responsive gate here: where the note is shown differs between
+        // the phone and desktop compositions, so each caller decides.
+        "font-caveat flex rotate-[-4deg] items-center gap-3 text-2xl text-neutral-500 opacity-80 dark:text-neutral-400 select-none",
         side === "left" && "absolute top-0 right-[calc(100%+3rem)] w-max",
         side === "right" && "absolute top-0 left-[calc(100%+3rem)] w-max",
         arrowPosition === "top" || arrowPosition === "bottom"

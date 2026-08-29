@@ -52,9 +52,12 @@
   width: 0;
   height: 0;
 
-  /* Written by design-stage's `measure`: the offset that puts the mockup at
-   * production height. The scene eases it away on the approach. */
+  /* Written by design-stage's `measure`. Vertically: the offset that puts the
+   * mockup at production height, which the scene eases away on the approach.
+   * Horizontally: 0 everywhere except phones, which offset the stage to crop
+   * it — see computeMobilePlacement. */
   margin-top: var(--stage-rest-offset, 0px);
+  margin-left: var(--stage-rest-left, 0px);
 }
 
 /* GSAP owns this node's transform. Nothing else may write to it. */
@@ -97,28 +100,57 @@
   opacity: 0;
 }
 
-/* Degrade below md and for reduced motion. The breakpoint mirrors SCENE_MQ in
- * mockup-scene.tsx — keep them in sync. This collapses the scene's height
- * rather than only freezing the animation: ~180svh of dead scroll with nothing
- * happening in it is worse than having no scene at all. */
-@media (max-width: 767px), (prefers-reduced-motion: reduce) {
+/*
+ * Phones. The breakpoint mirrors MOBILE_MAX_W in stage-geometry.ts and the
+ * inverse of SCENE_MQ in mockup-scene.tsx — keep all three in sync.
+ *
+ * No pin and no pan: the composition is static and deliberately cropped, and
+ * the only thing scrolling drives is the battery popover. Collapsing the height
+ * matters as much as dropping the animation — ~180svh of dead scroll with
+ * nothing happening in it is worse than having no scene at all.
+ */
+@media (max-width: 767px) {
+  .scene {
+    height: auto;
+    padding-block: 3rem;
+  }
+
+  /* `relative`, not `static` — the stage nodes are absolutely positioned and
+   * still need this as their containing block. The height is a literal so the
+   * page is the right length at first paint; it is MOBILE_PIN_H, and
+   * stage-geometry derives the same number from the scale. */
+  .pin {
+    position: relative;
+    height: 839px;
+  }
+
+  .aside {
+    display: none;
+  }
+}
+
+/*
+ * Reduced motion on anything wider. Unlike phones this keeps the whole machine
+ * visible and centred — a cropped composition is a deliberate phone layout, not
+ * something to impose on a desktop reader who only asked for less movement.
+ */
+@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
   .scene {
     height: auto;
     padding-block: 4rem;
   }
 
-  /* `relative`, not `static` — the stage nodes are absolutely positioned and
-   * still need this as their containing block. */
   .pin {
     position: relative;
     height: auto;
     aspect-ratio: 1454 / 872;
   }
 
-  /* `measure` writes 0 here too, but set it explicitly so the degraded layout
-   * is correct before JS runs. */
+  /* `measure` writes 0 here too, but set it explicitly so the layout is right
+   * before JS runs. */
   .stageViewport {
     margin-top: 0;
+    margin-left: 0;
   }
 
   .aside {

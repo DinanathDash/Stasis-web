@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
+import { gsap, ScrollTrigger } from "@/lib/scroll/gsap";
 import { HandwrittenNote } from "@/components/ui/handwritten-note";
 import { SCENE_NOTE_SWAP } from "@/lib/ease";
 import { AnimatedMockupBody } from "./animated-mockup";
@@ -15,6 +16,7 @@ import {
   NOTE_ALT_TOP,
   SCENE_REVEAL_AT,
   SCENE_RESET_AT,
+  MOBILE_MAX_W,
 } from "./stage-geometry";
 
 /**
@@ -125,6 +127,29 @@ export function StagedAnimatedMockup() {
     { dependencies: [timeline], scope: rootRef },
   );
 
+  // Phones build no timeline, so the popover gets its own trigger: it opens as
+  // the machine comes into view and closes on the way back up. That is the only
+  // thing scrolling does down here — the composition itself never moves.
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add(
+        `(max-width: ${MOBILE_MAX_W}px) and (prefers-reduced-motion: no-preference)`,
+        () => {
+          if (!rootRef.current) return;
+          ScrollTrigger.create({
+            trigger: rootRef.current,
+            start: "top 70%",
+            onEnter: () => setBatteryOpen(true),
+            onLeaveBack: () => setBatteryOpen(false),
+          });
+        },
+      );
+      return () => mm.revert();
+    },
+    { scope: rootRef },
+  );
+
   return (
     <div
       ref={rootRef}
@@ -147,7 +172,7 @@ export function StagedAnimatedMockup() {
           stays so in the degraded branch, where no timeline reveals it. */}
       <div
         ref={noteAltRef}
-        className="pointer-events-none absolute z-50 hidden w-max opacity-0 md:block"
+        className="pointer-events-none absolute z-50 hidden w-max opacity-0 xl:block"
         style={{ top: NOTE_ALT_TOP, left: NOTE_ALT_LEFT }}
       >
         <HandwrittenNote
@@ -159,7 +184,7 @@ export function StagedAnimatedMockup() {
           // arc from an "n" into a "u" so it sweeps under the gap rather than
           // over it. Together they compose to rotate(172deg).
           arrowClassName="[transform:rotate(-8deg)_scaleX(-1)_scaleY(-1)]"
-          className="text-white opacity-90 rotate-[-6deg]"
+          className="opacity-90 rotate-[-6deg]"
         >
           psst.... its interactive!
         </HandwrittenNote>

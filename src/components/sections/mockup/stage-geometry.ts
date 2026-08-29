@@ -138,6 +138,58 @@ export function computeSceneTargets(
   };
 }
 
+// ---------------------------------------------------------------------------
+// Phones. Mirrors the `max-width: 767px` branch in mockup-scene.module.css.
+// ---------------------------------------------------------------------------
+
+/** Keep in sync with the media query in mockup-scene.module.css. */
+export const MOBILE_MAX_W = 767;
+
+/**
+ * On a phone the mockup is not fitted to the viewport — it is scaled so its own
+ * authoring px land 1:1 on screen, and then cropped.
+ *
+ * Fitting it whole gives a 257px machine on a 390px phone, which puts the
+ * Stasis UI at 0.18 scale: the popover would be 43px wide and its 10px text
+ * unreadable, so the reveal communicates nothing. At 1:1 the popover is 240px
+ * and legible, which costs about 60% of the machine off the left edge.
+ */
+export const MOBILE_SCALE = START_MAX_W / STAGE_W;
+
+/** Where the lid's right edge lands, as a fraction of viewport width. The
+ *  remainder is the clear space the note sits over. Anchoring the *lid* rather
+ *  than the stage box matters: the base flares wider lower down, so the stage's
+ *  own right edge is 100px further out than the machine looks. */
+export const MOBILE_LID_RIGHT_VW = 0.78;
+
+/** Room above the machine for the note, and below it for the shadow. */
+export const MOBILE_TOP = 92;
+export const MOBILE_BOTTOM = 56;
+
+/** The pin's height on a phone. A literal in the CSS as well, so the page has
+ *  the right height at first paint rather than after `measure` runs. */
+export const MOBILE_PIN_H = Math.round(
+  MOBILE_TOP + STAGE_H * MOBILE_SCALE + MOBILE_BOTTOM,
+);
+
+/**
+ * Where to put the stage on a phone, as offsets from the pin's centre — the
+ * point `.stageViewport` sits on.
+ *
+ * There is no scroll-driven movement here at all: the composition is static and
+ * the only thing scrolling changes is whether the battery popover is open.
+ */
+export function computeMobilePlacement(vw: number, pinH: number) {
+  const s = MOBILE_SCALE;
+  // Distance from the stage's centre out to the lid's right edge.
+  const lidArm = (LID_RIGHT * DU_PER_CSS_PX - STAGE_W / 2) * s;
+  return {
+    scale: s,
+    left: MOBILE_LID_RIGHT_VW * vw - lidArm - vw / 2,
+    top: MOBILE_TOP + (STAGE_H / 2 - STAGE_OPTICAL_DY) * s - pinH / 2,
+  };
+}
+
 /** Screen-local rects for the Stasis UI, measured off the old
  *  static-screen.png (in git history). Not rendered yet — the seed for the
  *  settings window and menu-bar popover. */

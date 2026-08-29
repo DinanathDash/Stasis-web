@@ -11,6 +11,8 @@ import {
   STAGE_GUTTER_X,
   STAGE_GUTTER_Y,
   SCENE_REST_TOP,
+  MOBILE_MAX_W,
+  computeMobilePlacement,
 } from "./stage-geometry";
 
 /**
@@ -102,9 +104,36 @@ export function useStageFit({
     const { width, height } = pin.getBoundingClientRect();
     pinWidthRef.current = width;
     pinHeightRef.current = height;
-    const availW = width - 2 * STAGE_GUTTER_X;
-    const availH = height - 2 * STAGE_GUTTER_Y;
-    const s = Math.min(availW, availH * STAGE_AR, START_MAX_W) / STAGE_W;
+
+    let s: number;
+    let top: number;
+    let left = 0;
+
+    if (width <= MOBILE_MAX_W) {
+      // Phones get a fixed scale and a deliberate crop rather than a fit — see
+      // computeMobilePlacement.
+      const m = computeMobilePlacement(width, height);
+      s = m.scale;
+      top = m.top;
+      left = m.left;
+    } else {
+      const availW = width - 2 * STAGE_GUTTER_X;
+      const availH = height - 2 * STAGE_GUTTER_Y;
+      s = Math.min(availW, availH * STAGE_AR, START_MAX_W) / STAGE_W;
+
+      // Open at production height rather than centred; the scene eases this
+      // away on the approach. Read the computed position rather than re-testing
+      // the media query, so this cannot disagree with the CSS about whether the
+      // scene is running.
+      //
+      // The optical nudge has to come back out here: `.stageBase` renders as
+      // `scale(s) translateY(DY)`, so its top edge lands DY*s below where the
+      // box centre alone would put it — ~31px at the default fit.
+      const pinned = getComputedStyle(pin).position === "sticky";
+      top = pinned
+        ? SCENE_REST_TOP + (STAGE_H / 2 - STAGE_OPTICAL_DY) * s - height / 2
+        : 0;
+    }
 
     baseScaleRef.current = s;
     // Order is load-bearing: transform functions apply right-to-left, so the
@@ -113,18 +142,9 @@ export function useStageFit({
     base.style.transform = `scale(${s}) translateY(${STAGE_OPTICAL_DY}px)`;
     pin.style.setProperty("--stage-base-scale", String(s));
 
-    // Open at production height rather than centred; the scene eases this away
-    // on the approach. Read the computed position rather than re-testing the
-    // media query, so this cannot disagree with the CSS about being degraded.
-    //
-    // The optical nudge has to come back out here: `.stageBase` renders as
-    // `scale(s) translateY(DY)`, so its top edge lands DY*s below where the box
-    // centre alone would put it — ~31px at the default fit.
-    const pinned = getComputedStyle(pin).position === "sticky";
-    restOffsetRef.current = pinned
-      ? SCENE_REST_TOP + (STAGE_H / 2 - STAGE_OPTICAL_DY) * s - height / 2
-      : 0;
-    pin.style.setProperty("--stage-rest-offset", `${restOffsetRef.current}px`);
+    restOffsetRef.current = top;
+    pin.style.setProperty("--stage-rest-offset", `${top}px`);
+    pin.style.setProperty("--stage-rest-left", `${left}px`);
 
     sync();
   }, [pinRef, sync]);
