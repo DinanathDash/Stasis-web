@@ -59,6 +59,7 @@ export function MockupScene({
     baseScaleRef,
     totalScaleRef,
     restOffsetRef,
+    pinHeightRef,
     measure,
     sync,
   } = useStageFit({ pinRef, scrollRef, varsRef: asideRef });
@@ -75,10 +76,14 @@ export function MockupScene({
         const pinEl = pinRef.current;
         if (!scrollEl || !sceneEl || !pinEl) return;
 
-        // Function-based values, re-evaluated on every refresh because both
-        // targets depend on viewport width and the measured base scale.
+        // Function-based values, re-evaluated on every refresh: both targets
+        // depend on the viewport, the measured base scale and the pin's height.
         const targets = () =>
-          computeSceneTargets(baseScaleRef.current, window.innerWidth);
+          computeSceneTargets(
+            baseScaleRef.current,
+            window.innerWidth,
+            pinHeightRef.current,
+          );
 
         // Normalised to 1 so collaborators can place tweens at a literal
         // fraction of the pin (see scene-context.tsx). Every tween must end at

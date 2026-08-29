@@ -49,6 +49,8 @@ export function useStageFit({
   const totalScaleRef = useRef(1);
   /** Cached in `measure` so `sync` never reads layout. See below. */
   const pinWidthRef = useRef(0);
+  /** The pin's height, for the scene's end-scale ceilings. */
+  const pinHeightRef = useRef(0);
   /** GSAP transform-cache getter, bound once per scroll node. See `sync`. */
   const getPropRef = useRef<ReturnType<typeof gsap.getProperty> | null>(null);
   const getPropTargetRef = useRef<HTMLElement | null>(null);
@@ -99,6 +101,7 @@ export function useStageFit({
     // short laptops, and `vw` includes the scrollbar gutter.
     const { width, height } = pin.getBoundingClientRect();
     pinWidthRef.current = width;
+    pinHeightRef.current = height;
     const availW = width - 2 * STAGE_GUTTER_X;
     const availH = height - 2 * STAGE_GUTTER_Y;
     const s = Math.min(availW, availH * STAGE_AR, START_MAX_W) / STAGE_W;
@@ -145,6 +148,7 @@ export function useStageFit({
     baseScaleRef,
     totalScaleRef,
     restOffsetRef,
+    pinHeightRef,
     measure,
     sync,
   };

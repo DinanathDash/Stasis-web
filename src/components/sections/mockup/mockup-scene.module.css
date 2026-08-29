@@ -31,11 +31,16 @@
   overflow: clip;
 
   /* Let ink — not layout — escape the clip edge. The frame's drop-shadow
-   * reaches ~95 legacy px below the machine, and clipping at the pin's own box
+   * reaches ~125 legacy px below the machine, and clipping at the pin's own box
    * sliced it off mid-falloff: invisible during the pin, but a hard horizontal
    * line once the sticky box releases and scrolls past the next section. This
-   * moves only the paint boundary, so it cannot produce a scrollbar. */
-  overflow-clip-margin: 8rem;
+   * moves only the paint boundary, so it cannot produce a scrollbar.
+   *
+   * Only the shadow ever reaches out here — computeSceneTargets caps the end
+   * scale so the machine itself always fits inside the pin, and spends this
+   * margin as its budget for the shadow. Keep it in sync with
+   * SCENE_CLIP_MARGIN in stage-geometry.ts. */
+  overflow-clip-margin: 16rem;
 }
 
 /* Zero-size box at the optical centre. Everything scales about this one point,

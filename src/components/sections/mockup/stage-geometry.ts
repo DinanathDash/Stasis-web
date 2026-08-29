@@ -77,18 +77,64 @@ export const NOTE_ALT_TOP = 22;
 export const SCENE_REVEAL_AT = 0.55;
 export const SCENE_RESET_AT = 0.04;
 
+/** How far the frame's `drop-shadow(0 20px 50px)` reaches below the machine, in
+ *  legacy px. Not the textbook 3 sigma (95px) — browsers approximate a Gaussian
+ *  with three box blurs, whose support is wider. Measured back from where ink
+ *  actually survives on screen: ~113px, rounded up for headroom. */
+const SHADOW_REACH = 125;
+
+/** Must match `overflow-clip-margin` on `.pin` in mockup-scene.module.css. The
+ *  shadow is allowed to paint this far past the pin's edge; the fit below uses
+ *  it as budget, so the two numbers have to agree. */
+export const SCENE_CLIP_MARGIN = 256;
+
+/** Distances from the stage's effective centre down to the machine's bottom
+ *  edge, and to the far end of its shadow, per unit of scale. */
+const ARM_TO_MACHINE = STAGE_H / 2 + STAGE_OPTICAL_DY;
+const ARM_TO_SHADOW = ARM_TO_MACHINE + SHADOW_REACH * LEGACY_SCALE;
+
 /**
  * `k` multiplies the base scale (the timeline runs 1 -> k); `x` is in real
  * screen px, since `translate(x) scale(k)` translates in the parent's space.
  * The bleed is asymmetric on purpose — off the left, stopping hard before the
  * right — which keeps the copy slot clear while the machine still reads as
  * larger than the frame it is in.
+ *
+ * The end scale is capped by the pin's HEIGHT as well as its width. Width alone
+ * ignores the viewport's aspect ratio, and on anything wide and short the
+ * composition outgrew the pin: at 1920x970 the machine's base was cropped and
+ * its shadow was sliced at the clip edge, and on an ultrawide the machine lost
+ * 230px. Two ceilings, both measured from the centre downward, which is the
+ * binding side because the scene biases the composition down:
+ *
+ *   - the machine itself must fit inside the pin, so it is never cropped;
+ *   - its shadow must fall inside the pin plus the clip margin, so it always
+ *     fades out rather than ending on an edge.
+ *
+ * The top needs no ceiling: its arm is shorter and its room is larger by twice
+ * the centre bias, so it can never bind first.
  */
-export function computeSceneTargets(baseScale: number, vw: number) {
-  const endScale = (SCENE_END_WIDTH_VW * vw) / STAGE_W;
+export function computeSceneTargets(
+  baseScale: number,
+  vw: number,
+  pinH: number,
+) {
+  const byWidth = (SCENE_END_WIDTH_VW * vw) / STAGE_W;
+  const room = pinH / 2 - SCENE_CENTER_BIAS;
+  const endScale =
+    pinH > 0
+      ? Math.min(
+          byWidth,
+          room / ARM_TO_MACHINE,
+          (room + SCENE_CLIP_MARGIN) / ARM_TO_SHADOW,
+        )
+      : byWidth;
+
   return {
     k: baseScale > 0 ? endScale / baseScale : 1,
-    x: (SCENE_END_RIGHT_VW - SCENE_END_WIDTH_VW / 2 - 0.5) * vw,
+    // Derived from the scale that actually won, so the right edge stays pinned
+    // at SCENE_END_RIGHT_VW even when a height ceiling has shrunk the stage.
+    x: SCENE_END_RIGHT_VW * vw - vw / 2 - (STAGE_W * endScale) / 2,
   };
 }
 
