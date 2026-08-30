@@ -17,6 +17,10 @@ const isProduction =
 export const seoMetadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
 
+  alternates: {
+    canonical: siteConfig.url,
+  },
+
   title: {
     default: "Stasis - A smarter battery icon for your MacBook",
     template: `%s | ${siteConfig.name}`,
@@ -100,6 +104,7 @@ export const seoMetadata: Metadata = {
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
       { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
     ],
+    shortcut: ["/favicon-32x32.png"],
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
       {
