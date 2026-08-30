@@ -25,6 +25,8 @@ export function AssetPreloader() {
       "/dmg/dmg-background.webp",
       "/dmg/arrow-horizontal.svg",
       "/dmg/arrow-vertical.svg",
+      "/dmg/app-icon.png",
+      "/dmg/mac-drive.png",
     ];
 
     imagesToPreload.forEach((src) => {
