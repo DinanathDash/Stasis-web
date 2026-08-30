@@ -94,7 +94,7 @@ export function MockupScene({
         tl.fromTo(
           scrollEl,
           { scale: 1 },
-          { scale: () => targets().k, ease: SCENE_EASE_GROW, force3D: true },
+          { scale: () => targets().k, ease: SCENE_EASE_GROW, force3D: false },
           0,
         ).fromTo(
           scrollEl,
@@ -103,7 +103,7 @@ export function MockupScene({
             x: () => targets().x,
             duration: 1 - SCENE_DRIFT_OFFSET,
             ease: SCENE_EASE_DRIFT,
-            force3D: true,
+            force3D: false,
           },
           // A second beat, after the growth has started. Baking it into
           // transform-origin instead would make this retiming impossible.
@@ -164,7 +164,7 @@ export function MockupScene({
               // the stage centred and biased down to clear the header.
               y: () => SCENE_CENTER_BIAS - restOffsetRef.current,
               ease: SCENE_EASE_SETTLE,
-              force3D: true,
+              force3D: false,
             },
           ),
         });
@@ -189,7 +189,12 @@ export function MockupScene({
 
   return (
     <section ref={sceneRef} className={styles.scene}>
-      <div ref={pinRef} className={styles.pin} data-screen-live="false">
+      <div
+        ref={pinRef}
+        className={styles.pin}
+        data-screen-live="false"
+        suppressHydrationWarning
+      >
         <SceneProvider
           value={{
             timeline,

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { siApple } from "simple-icons";
 import { Zap } from "lucide-react";
 import { ProtectedImage } from "@/components/ui/protected-image";
-import { Dock, DockIcon } from "@/components/ui/dock";
+import { Dock, DockIcon, DockSeparator } from "@/components/ui/dock";
 import { BatteryPopover } from "./battery-popover";
 
 interface MainScreenProps {
@@ -151,8 +151,18 @@ export function MainScreen({
             className="bg-transparent !border-none !shadow-none"
           />
           <DockIcon
+            icon="/icons/App Store.svg"
+            tooltip="App Store"
+            className="bg-transparent !border-none !shadow-none"
+          />
+          <DockIcon
             icon="/icons/Notes.svg"
             tooltip="Notes"
+            className="bg-transparent !border-none !shadow-none"
+          />
+          <DockIcon
+            icon="/icons/Music.svg"
+            tooltip="Music"
             className="bg-transparent !border-none !shadow-none"
           />
           <DockIcon
@@ -160,11 +170,7 @@ export function MainScreen({
             tooltip="Safari"
             className="bg-transparent !border-none !shadow-none"
           />
-          {/* WebP, not SVG. The SVG was a 36px icon wrapping a 1024x1024 and
-              a 2752x1536 base64 PNG — 8.1MB, and `next/image` passes SVGs
-              through untouched, so every visitor downloaded all of it for a
-              dock icon. Rasterised losslessly at 512, which covers the widest
-              magnified size the dock reaches. */}
+          <DockSeparator />
           <DockIcon
             icon="/icons/Stasis.webp"
             tooltip="Stasis"

@@ -111,13 +111,15 @@ export default async function ChangelogPage() {
       "https://api.github.com/repos/DinanathDash/Stasis/releases",
       {
         next: { revalidate: 3600 },
-      }
+      },
     );
     if (releasesRes.ok) {
       const releasesData = await releasesRes.json();
       releasesData.forEach((r: { prerelease: boolean; tag_name: string }) => {
         if (r.prerelease) {
-          const version = r.tag_name.startsWith('v') ? r.tag_name.substring(1) : r.tag_name;
+          const version = r.tag_name.startsWith("v")
+            ? r.tag_name.substring(1)
+            : r.tag_name;
           preReleases.add(version);
         }
       });
@@ -135,9 +137,9 @@ export default async function ChangelogPage() {
     );
     if (res.ok) {
       const text = await res.text();
-      releases = parseChangelog(text).map(r => ({
+      releases = parseChangelog(text).map((r) => ({
         ...r,
-        isPreRelease: preReleases.has(r.version)
+        isPreRelease: preReleases.has(r.version),
       }));
     }
   } catch (error) {

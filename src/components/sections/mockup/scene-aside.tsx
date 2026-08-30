@@ -62,7 +62,7 @@ export function SceneAside() {
   );
 
   return (
-    <div ref={ref} className="flex flex-col gap-8">
+    <div ref={ref} className="flex flex-col gap-8 -z-10">
       {ITEMS.map((item) => (
         <div key={item.title} data-aside-item>
           <h3 className="mb-1.5 text-lg font-medium tracking-tight lg:text-xl">

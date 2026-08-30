@@ -8,7 +8,7 @@ import { Cta } from "@/components/sections/cta";
 // The scene is independent of which mockup it animates — swap `device`.
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start pb-24">
+    <main className="flex min-h-screen flex-col items-center justify-start pb-24 overflow-x-clip">
       <Hero />
       <MockupScene device={<StagedAnimatedMockup />} aside={<SceneAside />} />
       <Features />

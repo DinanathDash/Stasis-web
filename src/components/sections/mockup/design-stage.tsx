@@ -12,6 +12,11 @@ import {
   STAGE_GUTTER_Y,
   SCENE_REST_TOP,
   MOBILE_MAX_W,
+  MOBILE_LID_RIGHT_VW,
+  LID_RIGHT,
+  MOBILE_TOP,
+  MOBILE_PIN_H,
+  DU_PER_CSS_PX,
   computeMobilePlacement,
 } from "./stage-geometry";
 
@@ -192,7 +197,37 @@ export function StageNodes({
   children: React.ReactNode;
 }) {
   return (
-    <div ref={viewportRef} className={viewportClassName}>
+    <div
+      ref={viewportRef}
+      className={viewportClassName}
+      suppressHydrationWarning
+    >
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function(){
+              var w = window.innerWidth, h = window.innerHeight;
+              var s, t = 0, l = 0;
+              if (w <= ${MOBILE_MAX_W}) {
+                s = ${START_MAX_W / STAGE_W};
+                var lidArm = (${LID_RIGHT} * ${DU_PER_CSS_PX} - ${STAGE_W} / 2) * s;
+                l = ${MOBILE_LID_RIGHT_VW} * w - lidArm - w / 2;
+                t = ${MOBILE_TOP} + (${STAGE_H / 2 - STAGE_OPTICAL_DY}) * s - ${MOBILE_PIN_H} / 2;
+              } else {
+                s = Math.min(w - ${2 * STAGE_GUTTER_X}, (h - ${2 * STAGE_GUTTER_Y}) * ${STAGE_AR}, ${START_MAX_W}) / ${STAGE_W};
+                var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                t = reduced ? 0 : ${SCENE_REST_TOP} + (${STAGE_H / 2 - STAGE_OPTICAL_DY}) * s - h / 2;
+              }
+              var pin = document.currentScript.parentElement.parentElement;
+              if (pin) {
+                pin.style.setProperty('--stage-base-scale', s);
+                pin.style.setProperty('--stage-rest-offset', t + 'px');
+                pin.style.setProperty('--stage-rest-left', l + 'px');
+              }
+            })();
+          `,
+        }}
+      />
       <div ref={scrollRef} className={scrollClassName}>
         <div
           ref={baseRef}
@@ -202,6 +237,7 @@ export function StageNodes({
             height: STAGE_H,
             left: -STAGE_W / 2,
             top: -STAGE_H / 2,
+            transform: `scale(var(--stage-base-scale, ${START_MAX_W / STAGE_W})) translateY(${STAGE_OPTICAL_DY}px)`,
           }}
         >
           {children}
