@@ -50,6 +50,13 @@ export default function RootLayout({
     },
   };
 
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteConfig.name,
+    url: siteConfig.url,
+  };
+
   return (
     <html lang="en">
       <body
@@ -57,7 +64,9 @@ export default function RootLayout({
       >
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([websiteJsonLd, jsonLd]),
+          }}
         />
         <Header />
         <SmoothScrollProvider>

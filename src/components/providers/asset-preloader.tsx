@@ -20,13 +20,29 @@ import { useEffect } from "react";
 export function AssetPreloader() {
   useEffect(() => {
     const imagesToPreload = [
-      // None of this exists in the DOM until the download button is clicked,
-      // so without warming it the fetch begins on the click.
-      "/dmg/dmg-background.webp",
+      "/background.webp",
+      "/cta.webp",
+      "/cutting-mat.webp",
+      "/dmg/app-icon.png",
       "/dmg/arrow-horizontal.svg",
       "/dmg/arrow-vertical.svg",
-      "/dmg/app-icon.png",
+      "/dmg/dmg-background.webp",
       "/dmg/mac-drive.png",
+      "/features/energy.png",
+      "/features/magsafe.jpg",
+      "/icons/App Store.svg",
+      "/icons/Finder.svg",
+      "/icons/Music.svg",
+      "/icons/Notes.svg",
+      "/icons/Photos.svg",
+      "/icons/Safari.svg",
+      "/icons/Stasis.webp",
+      "/mockup/battery.svg",
+      "/mockup/control-centre.svg",
+      "/mockup/macos-bg.avif",
+      "/mockup/mockup.png",
+      "/mockup/power-sankey.svg",
+      "/mockup/wifi.svg",
     ];
 
     imagesToPreload.forEach((src) => {
@@ -34,12 +50,10 @@ export function AssetPreloader() {
       img.src = src;
     });
 
-    // The feature videos set `preload="auto"` themselves, but sit far below the
-    // fold; starting them here means they are ready on arrival.
     const videosToPreload = [
-      "/features/spotlight.mov",
-      "/features/power-flow.mov",
       "/features/notch-hud.mp4",
+      "/features/power-flow.mov",
+      "/features/spotlight.mov",
     ];
 
     videosToPreload.forEach((src) => {
