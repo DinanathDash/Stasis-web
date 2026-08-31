@@ -86,13 +86,13 @@ export async function Hero() {
           and extend your battery&apos;s lifespan — all from the menu bar.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 w-full sm:w-auto px-4 sm:px-0">
+        <div className="flex flex-col sm:grid sm:grid-cols-2 items-stretch sm:items-center justify-center gap-4 w-full sm:w-auto px-4 sm:px-0">
           <HeroDownloadButton />
           <Button
             asChild
             variant="outline"
             size="lg"
-            className="h-12 md:h-14 w-full sm:w-auto text-base md:text-lg group relative overflow-hidden rounded-xl px-6 md:px-8 font-medium bg-background/50 backdrop-blur-md border-border/50 text-foreground transition-all duration-300 shadow-sm"
+            className="h-12 md:h-14 w-full text-base md:text-lg group relative overflow-hidden rounded-xl px-6 md:px-8 font-medium bg-background/50 backdrop-blur-md border-border/50 text-foreground transition-all duration-300 shadow-sm"
           >
             <a
               href="https://github.com/DinanathDash/Stasis"
@@ -113,9 +113,9 @@ export async function Hero() {
               <span aria-hidden className="invisible flex items-center gap-2">
                 <span className="w-7 mr-2 shrink-0" />
                 <span className="whitespace-nowrap">Star on GitHub</span>
-                <span className="w-0 shrink-0" />
+                <span className="w-0 -ml-2 shrink-0" />
                 {stars ? (
-                  <span className="ml-2 flex items-center shrink-0">
+                  <span className="flex items-center shrink-0">
                     <span className="mr-2 w-px shrink-0" />
                     <span className="text-sm font-semibold tabular-nums md:text-base">
                       {stars}
@@ -125,7 +125,12 @@ export async function Hero() {
               </span>
 
               {/* Out of flow, so none of its width changes reach the button. */}
-              <span className="absolute inset-0 flex items-center justify-center gap-2">
+              {/* Shifted 4px left, which lands the count's right edge on the
+                  Download label's. A transform rather than padding: padding
+                  would re-flow the row and pull the divider off centre again.
+                  The two rows differ in width, so one has to sit slightly off
+                  centre for their right edges to meet. */}
+              <span className="absolute inset-0 flex -translate-x-1 items-center justify-center gap-2">
                 <div className="flex items-center justify-start w-7 mr-2 opacity-100 transition-all duration-300 ease-out group-hover:w-0 group-hover:mr-0 group-hover:opacity-0 group-hover:scale-50 shrink-0">
                   <svg
                     role="img"
@@ -142,23 +147,27 @@ export async function Hero() {
                 {/* Sits against the label rather than after the count, so it
                   unfurls out of the text the way it did before the count
                   existed. Zero-width at rest, so it costs nothing there. */}
-                <div className="flex items-center justify-end w-0 opacity-0 transition-all duration-300 ease-out group-hover:w-7 group-hover:ml-2 group-hover:opacity-100 shrink-0">
+                <div className="flex items-center justify-end w-0 -ml-2 opacity-0 transition-all duration-300 ease-out group-hover:w-7 group-hover:ml-2 group-hover:opacity-100 shrink-0">
                   <ArrowRight className="!h-6 !w-6 shrink-0 -translate-x-4 scale-50 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:scale-100" />
                 </div>
-                {/* Collapses on hover on the same 300ms curve as the mark, so the
-                  label and arrow are alone by the time it finishes. `max-w`
-                  rather than a fixed `w`, because the count's width varies with
-                  its digits. */}
+                {/* Collapses on the same curve as the mark, via a `1fr -> 0fr`
+                  grid track. `max-width` cannot do this: the track has to be
+                  wider than any count it might hold, so the visible width sits
+                  pinned at its content size until max-width falls below it, and
+                  the collapse then lurches through the back half of the ease.
+                  A `1fr` track measures the content, so it eases honestly. */}
                 {stars ? (
-                  <span className="ml-2 flex max-w-24 items-center overflow-hidden opacity-100 transition-all duration-300 ease-out group-hover:ml-0 group-hover:max-w-0 group-hover:scale-50 group-hover:opacity-0 shrink-0">
-                    <span
-                      aria-hidden
-                      className="mr-2 h-5 w-px shrink-0 bg-border/70"
-                    />
-                    <span className="text-sm font-semibold tabular-nums md:text-base">
-                      {stars}
+                  <span className="grid grid-cols-[1fr] opacity-100 transition-all duration-300 ease-out group-hover:grid-cols-[0fr] group-hover:opacity-0 shrink-0">
+                    <span className="flex min-w-0 items-center overflow-hidden">
+                      <span
+                        aria-hidden
+                        className="mr-2 h-5 w-px shrink-0 bg-border/70"
+                      />
+                      <span className="text-sm font-semibold tabular-nums md:text-base">
+                        {stars}
+                      </span>
+                      <span className="sr-only"> stars</span>
                     </span>
-                    <span className="sr-only"> stars</span>
                   </span>
                 ) : null}
               </span>

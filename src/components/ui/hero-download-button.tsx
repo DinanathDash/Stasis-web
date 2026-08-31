@@ -17,7 +17,7 @@ export function HeroDownloadButton() {
       />
       <Button
         size="lg"
-        className="h-12 md:h-14 w-full sm:w-auto text-base md:text-lg group relative rounded-xl px-6 md:px-8 font-medium shadow-lg transition-all duration-300 bg-foreground text-background hover:bg-foreground cursor-pointer flex items-center justify-center"
+        className="h-12 md:h-14 w-full text-base md:text-lg group relative rounded-xl px-6 md:px-8 font-medium shadow-lg transition-all duration-300 bg-foreground text-background hover:bg-foreground border border-transparent cursor-pointer flex items-center justify-center"
         onClick={() => setIsDownloadDialogOpen(true)}
       >
         <div className="flex items-center justify-start w-7 mr-2 opacity-100 transition-all duration-300 ease-out group-hover:w-0 group-hover:mr-0 group-hover:opacity-0 group-hover:scale-50 shrink-0">
@@ -33,7 +33,7 @@ export function HeroDownloadButton() {
         <span className="whitespace-nowrap relative z-10">
           Download for Mac
         </span>
-        <div className="flex items-center justify-end w-0 opacity-0 transition-all duration-300 ease-out group-hover:w-7 group-hover:ml-2 group-hover:opacity-100 shrink-0">
+        <div className="flex items-center justify-end w-0 -ml-2 opacity-0 transition-all duration-300 ease-out group-hover:w-7 group-hover:ml-2 group-hover:opacity-100 shrink-0">
           <ArrowRight className="!h-6 !w-6 shrink-0 -translate-x-4 scale-50 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:scale-100" />
         </div>
       </Button>
