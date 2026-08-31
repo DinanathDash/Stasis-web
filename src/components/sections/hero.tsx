@@ -4,6 +4,13 @@ import { siGithub } from "simple-icons";
 import { ProtectedBackground } from "@/components/ui/protected-background";
 import { HeroDownloadButton } from "@/components/ui/hero-download-button";
 
+/** 16 -> "16", 2800 -> "2.8k", 12400 -> "12k". */
+function formatStars(count: number) {
+  if (count < 1000) return String(count);
+  const k = count / 1000;
+  return `${k >= 10 ? Math.round(k) : Math.round(k * 10) / 10}k`;
+}
+
 export async function Hero() {
   let version = "1.0.0";
   let releaseUrl = "https://github.com/DinanathDash/Stasis/releases/latest";
@@ -24,6 +31,26 @@ export async function Hero() {
     }
   } catch (error) {
     console.error("Failed to fetch Stasis release version:", error);
+  }
+
+  // Left null when unavailable, so the button renders without a count rather
+  // than claiming a stale or wrong one.
+  let stars: string | null = null;
+  try {
+    const res = await fetch(
+      "https://api.github.com/repos/DinanathDash/Stasis",
+      {
+        next: { revalidate: 3600 },
+      },
+    );
+    if (res.ok) {
+      const data = await res.json();
+      if (typeof data.stargazers_count === "number") {
+        stars = formatStars(data.stargazers_count);
+      }
+    }
+  } catch (error) {
+    console.error("Failed to fetch Stasis star count:", error);
   }
 
   return (
@@ -71,24 +98,70 @@ export async function Hero() {
               href="https://github.com/DinanathDash/Stasis"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center"
+              className="relative flex items-center justify-center"
             >
-              <div className="flex items-center justify-start w-7 mr-2 opacity-100 transition-all duration-300 ease-out group-hover:w-0 group-hover:mr-0 group-hover:opacity-0 group-hover:scale-50 shrink-0">
-                <svg
-                  role="img"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="!h-6 !w-6 fill-current shrink-0"
-                >
-                  <path d={siGithub.path} />
-                </svg>
-              </div>
-              <span className="whitespace-nowrap relative z-10">
-                View on GitHub
+              {/*
+                A copy of the resting row, invisible and never animated. It is
+                the only child in flow, so it alone sets the button's width and
+                holds it steady while the real content animates on top.
+
+                Without it the box shrinks on hover: collapsing the mark and the
+                count frees more width than the arrow takes back. A `min-w-*`
+                literal would not do either, since the resting width moves with
+                the number of digits in the star count.
+              */}
+              <span aria-hidden className="invisible flex items-center gap-2">
+                <span className="w-7 mr-2 shrink-0" />
+                <span className="whitespace-nowrap">Star on GitHub</span>
+                <span className="w-0 shrink-0" />
+                {stars ? (
+                  <span className="ml-2 flex items-center shrink-0">
+                    <span className="mr-2 w-px shrink-0" />
+                    <span className="text-sm font-semibold tabular-nums md:text-base">
+                      {stars}
+                    </span>
+                  </span>
+                ) : null}
               </span>
-              <div className="flex items-center justify-end w-0 opacity-0 transition-all duration-300 ease-out group-hover:w-7 group-hover:ml-2 group-hover:opacity-100 shrink-0">
-                <ArrowRight className="!h-6 !w-6 shrink-0 -translate-x-4 scale-50 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:scale-100" />
-              </div>
+
+              {/* Out of flow, so none of its width changes reach the button. */}
+              <span className="absolute inset-0 flex items-center justify-center gap-2">
+                <div className="flex items-center justify-start w-7 mr-2 opacity-100 transition-all duration-300 ease-out group-hover:w-0 group-hover:mr-0 group-hover:opacity-0 group-hover:scale-50 shrink-0">
+                  <svg
+                    role="img"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="!h-6 !w-6 fill-current shrink-0"
+                  >
+                    <path d={siGithub.path} />
+                  </svg>
+                </div>
+                <span className="whitespace-nowrap relative z-10">
+                  Star on GitHub
+                </span>
+                {/* Sits against the label rather than after the count, so it
+                  unfurls out of the text the way it did before the count
+                  existed. Zero-width at rest, so it costs nothing there. */}
+                <div className="flex items-center justify-end w-0 opacity-0 transition-all duration-300 ease-out group-hover:w-7 group-hover:ml-2 group-hover:opacity-100 shrink-0">
+                  <ArrowRight className="!h-6 !w-6 shrink-0 -translate-x-4 scale-50 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:scale-100" />
+                </div>
+                {/* Collapses on hover on the same 300ms curve as the mark, so the
+                  label and arrow are alone by the time it finishes. `max-w`
+                  rather than a fixed `w`, because the count's width varies with
+                  its digits. */}
+                {stars ? (
+                  <span className="ml-2 flex max-w-24 items-center overflow-hidden opacity-100 transition-all duration-300 ease-out group-hover:ml-0 group-hover:max-w-0 group-hover:scale-50 group-hover:opacity-0 shrink-0">
+                    <span
+                      aria-hidden
+                      className="mr-2 h-5 w-px shrink-0 bg-border/70"
+                    />
+                    <span className="text-sm font-semibold tabular-nums md:text-base">
+                      {stars}
+                    </span>
+                    <span className="sr-only"> stars</span>
+                  </span>
+                ) : null}
+              </span>
             </a>
           </Button>
         </div>
