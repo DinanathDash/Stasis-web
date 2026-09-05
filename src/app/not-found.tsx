@@ -13,6 +13,7 @@ export default function NotFound() {
           src="/background.webp"
           alt="404 Background"
           fill
+          sizes="100vw"
           className="object-cover opacity-60"
           loading="eager"
           fetchPriority="high"
@@ -44,7 +45,11 @@ export default function NotFound() {
           size="lg"
           className="group relative overflow-hidden mt-12 rounded-2xl px-8 h-14 text-base font-semibold shadow-lg transition-all duration-300 hover:bg-foreground"
         >
-          <Link href="/" className="flex items-center justify-center">
+          <Link
+            href="/"
+            prefetch={false}
+            className="flex items-center justify-center"
+          >
             <div className="flex items-center justify-start w-7 mr-2 opacity-100 transition-all duration-500 ease-out group-hover:w-0 group-hover:mr-0 group-hover:opacity-0 group-hover:scale-50 shrink-0">
               <Home className="!h-5 !w-5 shrink-0" />
             </div>

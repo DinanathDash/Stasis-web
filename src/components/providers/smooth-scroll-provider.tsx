@@ -77,9 +77,15 @@ export function SmoothScrollProvider({
 
   // Next resets scroll on soft navigation, which Lenis does not observe — its
   // internal position stays stale and the next wheel event teleports.
+  // Delaying this by one tick ensures Next.js has finished DOM mutations and
+  // its own scroll restoration logic, allowing Lenis to reliably scroll to top.
   useEffect(() => {
-    getLenis()?.scrollTo(0, { immediate: true });
-    ScrollTrigger.refresh();
+    const timer = setTimeout(() => {
+      window.scrollTo(0, 0);
+      getLenis()?.scrollTo(0, { immediate: true });
+      ScrollTrigger.refresh();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [pathname]);
 
   return <>{children}</>;

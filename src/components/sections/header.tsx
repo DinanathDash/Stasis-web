@@ -71,6 +71,7 @@ export function Header() {
             <div className="flex items-center justify-between w-full">
               <Link
                 href="/"
+                prefetch={false}
                 onClick={(e) => {
                   handleSamePageScroll(e, "/");
                   setIsMobileMenuOpen(false);
@@ -99,6 +100,7 @@ export function Header() {
                 </a>
                 <Link
                   href="/changelog"
+                  prefetch={false}
                   onClick={(e) => handleSamePageScroll(e, "/changelog")}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-foreground/10 hover:text-foreground transition-all"
                 >
@@ -189,6 +191,7 @@ export function Header() {
                     </a>
                     <Link
                       href="/changelog"
+                      prefetch={false}
                       onClick={(e) => {
                         handleSamePageScroll(e, "/changelog");
                         setIsMobileMenuOpen(false);

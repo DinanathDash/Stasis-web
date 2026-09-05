@@ -40,6 +40,7 @@ export function Footer() {
           >
             <Link
               href="https://x.com/DinanathDash"
+              prefetch={false}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -62,6 +63,7 @@ export function Footer() {
           >
             <Link
               href="https://github.com/DinanathDash/Stasis"
+              prefetch={false}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -84,6 +86,7 @@ export function Footer() {
           >
             <Link
               href="mailto:reach@dinanath.dev"
+              prefetch={false}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -110,6 +113,7 @@ export function Footer() {
           >
             <Link
               href="/terms"
+              prefetch={false}
               onClick={(e) => handleSamePageScroll(e, "/terms")}
               className="flex items-center gap-2.5"
             >
@@ -124,6 +128,7 @@ export function Footer() {
           >
             <Link
               href="/privacy"
+              prefetch={false}
               onClick={(e) => handleSamePageScroll(e, "/privacy")}
               className="flex items-center gap-2.5"
             >

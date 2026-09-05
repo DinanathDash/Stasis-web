@@ -202,9 +202,9 @@ export function StageNodes({
       className={viewportClassName}
       suppressHydrationWarning
     >
-      <script
+      <div
         dangerouslySetInnerHTML={{
-          __html: `
+          __html: `<script>
             (function(){
               var w = window.innerWidth, h = window.innerHeight;
               var s, t = 0, l = 0;
@@ -218,14 +218,14 @@ export function StageNodes({
                 var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                 t = reduced ? 0 : ${SCENE_REST_TOP} + (${STAGE_H / 2 - STAGE_OPTICAL_DY}) * s - h / 2;
               }
-              var pin = document.currentScript.parentElement.parentElement;
+              var pin = document.currentScript.parentElement.parentElement.parentElement;
               if (pin) {
                 pin.style.setProperty('--stage-base-scale', s);
                 pin.style.setProperty('--stage-rest-offset', t + 'px');
                 pin.style.setProperty('--stage-rest-left', l + 'px');
               }
             })();
-          `,
+          </script>`,
         }}
       />
       <div ref={scrollRef} className={scrollClassName}>
